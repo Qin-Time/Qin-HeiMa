@@ -1,0 +1,20 @@
+:root {
+  --textcolor-deepdark: #121826;
+  --textcolor-lightgray: #848484;
+  --textcolor-cyan: #2CB5A5;
+  --textcolor-lightdark: #3C3E42;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1;
+}
+
+footer {
+  margin-bottom: 20px;
+}

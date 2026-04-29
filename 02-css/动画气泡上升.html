@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS 气泡上升动画</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(to bottom, #1a2a6c, #b21f1f, #fdbb2d);
+      /* 模拟深海到水面的渐变 */
+      background: linear-gradient(to top, #0f2027, #203a43, #2c5364);
+      /* 深色水域背景 */
+      overflow: hidden;
+      /* 防止气泡溢出屏幕产生滚动条 */
+      font-family: sans-serif;
+    }
+
+    .water-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* 气泡的基础样式 */
+    .bubble {
+      position: absolute;
+      bottom: -50px;
+      /* 初始位置在屏幕下方 */
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+      opacity: 0;
+      /* 初始不可见 */
+    }
+
+    /* 定义动画 */
+    @keyframes rise {
+      0% {
+        bottom: -50px;
+        transform: translateX(0) scale(1);
+        opacity: 0;
+      }
+
+      10% {
+        opacity: 0.8;
+        /* 出现 */
+      }
+
+      50% {
+        opacity: 0.6;
+      }
+
+      100% {
+        bottom: 110vh;
+        /* 移动到屏幕上方之外 */
+        transform: translateX(20px) scale(1.5);
+        /* 稍微向右偏移，且变大 */
+        opacity: 0;
+        /* 消失 */
+      }
+    }
+
+    /* 为了让摆动更自然，我们可以单独加一个左右晃动的动画，或者在 rise 里做复杂的贝塞尔曲线 */
+    /* 这里为了演示简单，我们在 rise 中通过 translateX 模拟简单的横向位移 */
+
+    /* 实际上，更真实的摆动通常需要结合两个动画，或者使用 cubic-bezier */
+    /* 下面是一个更复杂的单关键帧动画，模拟“S”型上升 */
+    @keyframes riseAndShake {
+      0% {
+        bottom: -50px;
+        transform: translateX(0) scale(0.5);
+        opacity: 0;
+      }
+
+      10% {
+        opacity: 0.8;
+      }
+
+      25% {
+        transform: translateX(-15px) scale(0.8);
+      }
+
+      50% {
+        transform: translateX(15px) scale(1.1);
+      }
+
+      75% {
+        transform: translateX(-10px) scale(1.3);
+      }
+
+      100% {
+        bottom: 110vh;
+        transform: translateX(0) scale(1.5);
+        opacity: 0;
+      }
+    }
+
+    /* 生成不同大小和速度的气泡 */
+    .bubble:nth-child(1) {
+      left: 10%;
+      width: 40px;
+      height: 40px;
+      animation: riseAndShake 4s infinite ease-in;
+      animation-delay: 0s;
+    }
+
+    .bubble:nth-child(2) {
+      left: 20%;
+      width: 20px;
+      height: 20px;
+      animation: riseAndShake 3s infinite ease-in;
+      animation-delay: 1s;
+    }
+
+    .bubble:nth-child(3) {
+      left: 35%;
+      width: 50px;
+      height: 50px;
+      animation: riseAndShake 5s infinite ease-in;
+      animation-delay: 2s;
+    }
+
+    .bubble:nth-child(4) {
+      left: 50%;
+      width: 30px;
+      height: 30px;
+      animation: riseAndShake 4.5s infinite ease-in;
+      animation-delay: 0.5s;
+    }
+
+    .bubble:nth-child(5) {
+      left: 65%;
+      width: 60px;
+      height: 60px;
+      animation: riseAndShake 6s infinite ease-in;
+      animation-delay: 1.5s;
+    }
+
+    .bubble:nth-child(6) {
+      left: 80%;
+      width: 25px;
+      height: 25px;
+      animation: riseAndShake 3.5s infinite ease-in;
+      animation-delay: 3s;
+    }
+
+    .bubble:nth-child(7) {
+      left: 90%;
+      width: 45px;
+      height: 45px;
+      animation: riseAndShake 5.5s infinite ease-in;
+      animation-delay: 2.5s;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="water-container">
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+  </div>
+
+</body>
+
+</html>

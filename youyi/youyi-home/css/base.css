@@ -1,0 +1,54 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, Helvetica Neue, Helvetica, Segoe UI, Arial, Roboto, PingFang SC, miui, Hiragino Sans GB, Microsoft Yahei, sans-serif;
+  /* min-height: 100vh; */
+}
+
+body * {
+  box-sizing: border-box;
+  /* 设定盒子模型 */
+}
+
+a {
+  text-decoration: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  /* 移除链接下划线 */
+}
+
+
+input,
+button,
+textarea {
+  color: inherit;
+  font: inherit;
+  border: none;
+  /* 表单、按钮、文本框初始化、去除边框 */
+}
+
+/* 移除默认轮廓，并添加自定义的焦点样式 */
+a:focus,
+input:focus,
+button:focus,
+textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.6);
+  /* 添加一个柔和的阴影 */
+}
+
+ol,
+ul {
+  list-style: none
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+ul,
+ol {
+  margin: 0;
+  padding: 0
+}

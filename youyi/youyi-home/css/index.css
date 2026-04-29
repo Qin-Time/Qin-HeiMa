@@ -1,0 +1,185 @@
+/* 头部样式 */
+header {
+  position: relative;
+  width: 100%;
+  height: 34.6667vw;
+  /* background-color: gray; */
+
+}
+
+/* 头部背景盒子,装饰盒子，所以用伪元素 */
+header::after {
+  content: '';
+  position: absolute;
+  /* 层叠层级和位置 */
+  z-index: -1;
+  top: 0;
+  left: 0;
+  /* border-radius: 0 0 100.0001px/19.9999px 100.0001px/19.9999px; 错误写法*/
+  width: 100%;
+  height: 32.5vw;
+  border-radius: 0 0 40vw 40vw/5.3333vw;
+  background: linear-gradient(180deg, #3ECEC5D8 0%, #26BCC6 100%);
+}
+
+/* 头部标题盒子 */
+header h1 {
+  margin: 5.3333vw auto;
+  width: 26.6667vw;
+  height: 13.3333vw;
+}
+
+header h1 img {
+  width: 100%;
+}
+
+/* 头部搜索盒子 */
+header .search {
+  position: absolute;
+  width: 92vw;
+  height: 10.6667vw;
+  border-radius: 5.8667vw;
+  /* 位置放于父盒子底部 */
+  bottom: 0;
+  /* 参照物不同左右移动两次，将盒子居中。另一种做法是父盒子设置padding将子盒子自动挤到中间。这种做法就要用calc函数计算子盒子宽度*/
+  left: 50%;
+  transform: translateX(-50%);
+
+  line-height: 10.6667vw;
+  font-size: 3.4667vw;
+  background-color: #FFFFFF;
+  box-shadow: 0vw 2vw 2.9333vw -0.9333vw #E0ECFAD1;
+
+}
+
+header .search a {
+  display: flex;
+  align-items: center;
+}
+
+header .search a svg {
+  margin-left: 5.3333vw;
+  margin-right: 2.6667vw;
+  width: 6vw;
+  height: 6vw;
+}
+
+/* 导航部分样式 */
+/* 导航上部样式 */
+nav .navtop {
+  display: flex;
+  width: 100%;
+  height: 32vw;
+  padding: 4vw;
+  justify-content: space-around;
+}
+
+nav .navtop .navitem {
+  flex: 1;
+  padding: 2.6667vw;
+  text-align: center;
+}
+
+nav .navtop .navitem svg {
+  width: 12.2667vw;
+  height: 12.2667vw;
+}
+
+nav .navtop .navitem p:first-of-type {
+  color: var(--textcolor-deepdark);
+  font-family: PingFang SC;
+  font-weight: medium;
+  font-size: 3.7333vw;
+  line-height: 5.6vw;
+  letter-spacing: 0vw;
+  text-align: center;
+}
+
+nav .navtop .navitem p:last-of-type {
+  color: var(--textcolor-lightgray);
+  font-family: PingFang SC;
+  font-weight: regular;
+  font-size: 2.9333vw;
+  line-height: 4.2667vw;
+  letter-spacing: 0vw;
+  text-align: center;
+}
+
+/* 导航下部样式 */
+nav .navbottom {
+  display: flex;
+  width: 100%;
+  height: 17.3333vw;
+  padding: 4vw;
+  justify-content: space-around;
+}
+
+nav .navbottom .navitem {
+  flex: 1;
+  /* padding: 1.3333vw; */
+  text-align: center;
+}
+
+nav .navbottom .navitem svg {
+  width: 8.2667vw;
+  height: 8.2667vw;
+}
+
+nav .navbottom .navitem p:first-of-type {
+  color: var(--textcolor-lightdark);
+  font-family: PingFang SC;
+  font-weight: regular;
+  font-size: 3.4667vw;
+  line-height: 5.0667vw;
+  letter-spacing: 0px;
+  text-align: center;
+}
+
+/* 轮播图样式 暂未加入JS功能*/
+.banner {
+  display: flex;
+  overflow: hidden;
+  width: 92vw;
+  height: 32vw;
+  border-radius: 5.3333vw;
+  margin: 4vw;
+}
+
+.banner ul {
+  display: flex;
+  width: 92vw;
+  height: 32vw;
+  transition: transform 1s ease-in-out;
+  transform: translateX(0);
+}
+
+.banner li {
+  min-width: 100%;
+  min-height: 100%;
+}
+
+.banner img {
+  width: 100%;
+  height: 100%;
+}
+
+/* tabs模块样式 */
+.tabs .tabs-card {
+  display: flex;
+  /* gap: 6.6667vw; */
+  margin-left: 4vw;
+  align-items: center;
+}
+
+.tabs .tabs-item a {
+  display: block;
+  width: 14.1333vw;
+  height: 11.7333vw;
+  line-height: 11.7333vw;
+  text-align: center;
+  color: #979797;
+  font-family: PingFang SC;
+  font-weight: regular;
+  font-size: 3.7333vw;
+  letter-spacing: 0px;
+}
