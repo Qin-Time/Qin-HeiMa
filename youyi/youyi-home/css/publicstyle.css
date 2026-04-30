@@ -9,12 +9,59 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  padding-bottom: calc(13.6vw + env(safe-area-inset-bottom, 20px));
 }
 
 main {
   flex: 1;
 }
 
-footer {
-  margin-bottom: 20px;
+/* 底部导航 */
+.main-nav {
+  display: flex;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 13.6vw;
+  padding: 0 4vw;
+  /* justify-content: space-evenly; */
+  z-index: 9;
+  /* 屏幕导航栏安全区 */
+  padding-bottom: env(safe-area-inset-bottom);
+  /* 视觉优化：加个背景色防止内容透出来 */
+  background-color: #fff;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  /* 可选：加点阴影 */
+}
+
+.main-nav>a {
+  flex: 1;
+  display: flex;
+  /* div 内部开启 Flex，为了居中图标 */
+  justify-content: center;
+  flex-direction: column;
+  /* 图标水平居中 */
+  align-items: center;
+  /* 图标垂直居中 */
+}
+
+.main-nav svg {
+  width: 6vw;
+  /* 建议给个固定大小，防止太小看不清 */
+  height: 6vw;
+  /* 或者用 max-width: 100% 也可以 */
+}
+
+.main-nav p {
+  color: #6F6F6F;
+  font-size: 2.6667vw;
+}
+
+.main-nav svg {
+  color: #E5EEED;
+}
+
+.main-nav .active svg {
+  color: var(--textcolor-cyan);
 }
