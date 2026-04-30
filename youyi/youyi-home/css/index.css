@@ -166,9 +166,13 @@ nav .navbottom .navitem p:first-of-type {
 /* tabs模块样式 */
 .tabs .tabs-card {
   display: flex;
+  /* 粘性定位 */
+  position: sticky;
+  top: 0;
   /* gap: 6.6667vw; */
   margin-left: 4vw;
   align-items: center;
+  background-color: #fff;
 }
 
 .tabs .tabs-item a {
