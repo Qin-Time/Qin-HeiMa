@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <input type="text">
+  <p>0/200字</p>
+  <script>
+    const input = document.querySelector("[type=text]");
+    const p = document.querySelector("p");
+
+    //动态检测文本内容长度
+    input.addEventListener("input", function () {
+      console.log(input.value.length);
+      p.innerText = `${input.value.length}/200字`;
+    })
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>年会抽奖</title>
+  <style>
+    .wrapper {
+      width: 840px;
+      height: 420px;
+      background: url(./bg01.jpg) no-repeat center / cover;
+      padding: 100px 250px;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrapper">
+    <strong>传智教育年会抽奖</strong>
+    <h1>一等奖：<span id="one">???</span></h1>
+    <h3>二等奖：<span id="two">???</span></h3>
+    <h5>三等奖：<span id="three">???</span></h5>
+    <button>点击</button>
+  </div>
+  <script>
+    // 需求：从数组随机抽取一二三等奖，显示到对应标签（已中奖的不再参与抽奖）
+
+    function getRandomIndex(length) {
+      // 生成 0 到 length (不包含 length，即length-1,不会越界) 的随机整数
+      return Math.floor(Math.random() * length);
+    }
+
+    // 第一步，声明数组存放用户
+    const userList = ['周杰伦', '张学友', '刘德华', '郭富城', '叶湘伦', '马嘉祺'];
+
+    // 第二步，math函数抽取中奖下标
+    // let winnerIndex = getRandomIndex(userList.length);
+    // console.log(winnerIndex);
+    // let winner = userList[winnerIndex];
+    // console.log(winner);
+
+    // 第三步，用下标读取中奖用户，输出到页面，然后从数组中删除中奖用户该元素
+
+    // const one = document.querySelectorAll('#one');
+    // console.log(one);
+    // one[0].innerText = winner;
+
+
+    // 思考，将抽奖功能封装成函数，接收用户数组，返回值为中奖用户，调用一次函数，将会返回中奖用户，但数组发生改变。反复调用就会持续在用户数组抽奖，直到内部元素抽光。
+    function getWinner(arr) {
+      let winner = "";
+      // 空数据判断结束返回
+      if (arr.length === 0) {
+        return null;
+      }
+      // 内部调用抽随机数函数
+      let winnerIndex = getRandomIndex(arr.length);
+      // 获得中奖用户
+      winner = arr[winnerIndex];
+      // 从数组中剔除中奖用户
+      arr.splice(winnerIndex, 1);
+      // 返回中奖用户
+      return winner;
+    }
+    //思考，将抽奖结果反馈也封装成函数，先运行抽奖再运行反馈。或者根据需求在抽奖函数内部调用反馈函数。该函数应该没有参数（内部调用情况），或者参数为抽奖函数的返回值。
+    function publish(winner, level) {
+      const tempData = document.querySelector(`#${level}`);
+      // querySelector字符串传参支持模版字符串
+      // 获取标签的值防御判断
+      if (tempData) {
+        tempData.innerText = winner;
+      }
+      // tempData.innerText = winner;
+      //对象?.方法  可选链防御  这里可选链写法错误，不能在赋值左边使用可选。理解为不能将值赋给一个不确定的元素，语法不支持。正确语法是可选链在右边，你可以将一个不确定的值赋给变量，如果值不存在，代码可以正常跳过运行。
+    }
+
+    //抽奖调用
+    // getWinner(userList);
+    publish(getWinner(userList), 'one');
+    publish(getWinner(userList), 'two');
+    publish(getWinner(userList), 'three');
+    const btn = document.querySelector('button');
+    console.dir(btn);
+
+  </script>
+</body>
+
+</html>

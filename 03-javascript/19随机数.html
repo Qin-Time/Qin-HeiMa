@@ -24,8 +24,8 @@
     }
 
     //生成0-length的随机数以供数组使用
+    // 生成 0 到 length (不包含 length，即length-1,不会越界) 的随机整数
     function getRandomIndex(length) {
-      // 生成 0 到 length (不包含 length，即length-1,不会越界) 的随机整数
       return Math.floor(Math.random() * length);
     }
 

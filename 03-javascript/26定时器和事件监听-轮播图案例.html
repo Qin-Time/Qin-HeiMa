@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>轮播图点击切换</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    .slider {
+      width: 560px;
+      height: 400px;
+      overflow: hidden;
+    }
+
+    .slider-wrapper {
+      width: 100%;
+      height: 320px;
+    }
+
+    .slider-wrapper img {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .slider-footer {
+      height: 80px;
+      background-color: rgb(100, 67, 68);
+      padding: 12px 12px 0 12px;
+      position: relative;
+    }
+
+    .slider-footer .toggle {
+      position: absolute;
+      right: 0;
+      top: 12px;
+      display: flex;
+    }
+
+    .slider-footer .toggle button {
+      margin-right: 12px;
+      width: 28px;
+      height: 28px;
+      appearance: none;
+      border: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .slider-footer .toggle button:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .slider-footer p {
+      margin: 0;
+      color: #fff;
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    .slider-indicator {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      align-items: center;
+    }
+
+    .slider-indicator li {
+      width: 8px;
+      height: 8px;
+      margin: 4px;
+      border-radius: 50%;
+      background: #fff;
+      opacity: 0.4;
+      cursor: pointer;
+    }
+
+    .slider-indicator li.active {
+      width: 12px;
+      height: 12px;
+      opacity: 1;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="slider">
+    <div class="slider-wrapper">
+      <img src="./images/slider01.jpg" alt="" />
+    </div>
+    <div class="slider-footer">
+      <p>对人类来说会不会太超前了？</p>
+      <ul class="slider-indicator">
+        <li class="active"></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+      </ul>
+      <div class="toggle">
+        <button class="prev">&lt;</button>
+        <button class="next">&gt;</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    // 1. 初始数据
+    const sliderData = [
+      { url: './images/slider01.jpg', title: '对人类来说会不会太超前了？', color: 'rgb(100, 67, 68)' },
+      { url: './images/slider02.jpg', title: '开启剑与雪的黑暗传说！', color: 'rgb(43, 35, 26)' },
+      { url: './images/slider03.jpg', title: '真正的jo厨出现了！', color: 'rgb(36, 31, 33)' },
+      { url: './images/slider04.jpg', title: '李玉刚：让世界通过B站看到东方大国文化', color: 'rgb(139, 98, 66)' },
+      { url: './images/slider05.jpg', title: '快来分享你的寒假日常吧~', color: 'rgb(67, 90, 92)' },
+      { url: './images/slider06.jpg', title: '哔哩哔哩小年YEAH', color: 'rgb(166, 131, 143)' },
+      { url: './images/slider07.jpg', title: '一站式解决你的电脑配置问题！！！', color: 'rgb(53, 29, 25)' },
+      { url: './images/slider08.jpg', title: '谁不想和小猫咪贴贴呢！', color: 'rgb(99, 72, 114)' },
+    ]
+    // 需求：1.自动定时轮播，2.鼠标经过暂停离开继续。3.左右按钮控制切换图片
+    // 获取页面需要操作的元素。
+    const slider = document.querySelector(".slider");
+    const img = document.querySelector("img");
+    const footer = document.querySelector(".slider-footer");
+    const p = document.querySelector("p");
+    const btnprev = document.querySelector(".prev");
+    const btnnext = document.querySelector(".next");
+    const dots = document.querySelectorAll(".slider-indicator li");
+
+    let info = 0;// 控制轮播图信息量
+    let timeId = 0;//全局定时器id
+
+    //小圆点函数
+    function updateDots() {
+      // 先移除所有圆点的 active 类
+      dots.forEach(dot => dot.classList.remove("active"));
+      // 再给当前索引对应的圆点添加 active 类
+      dots[info].classList.add("active");
+    }
+
+    // 更新信息函数
+    function updateView() {
+      img.src = sliderData[info].url;
+      p.innerText = sliderData[info].title;
+      footer.style.backgroundColor = sliderData[info].color;
+      updateDots(); // 每次切图，同步更新圆点
+    }
+
+    //下一张函数
+    function slideShow() {
+      info++;
+      if (info >= sliderData.length) {
+        info = 0;
+      }
+      updateView();
+    }
+
+    //上一张函数
+    function slideShowPrev() {
+      info--;
+      if (info < 0) {
+        info = sliderData.length - 1;
+      }
+      updateView();
+    }
+
+    // 开始轮播
+    function run() {
+      clearInterval(timeId);
+      timeId = setInterval(slideShow, 3000);
+    }
+
+    // 暂停轮播
+    function pause() {
+      clearInterval(timeId);
+    }
+
+    // 鼠标进入整个大盒子添加、移除定时器
+    run();
+    slider.addEventListener("mouseenter", pause);
+    slider.addEventListener("mouseleave", run);
+
+    // 添加左右按钮事件
+    btnnext.addEventListener("click", slideShow);
+    btnprev.addEventListener("click", slideShowPrev);
+
+    //小圆点事件
+    dots.forEach((dot, index) => {
+      dot.addEventListener("click", () => {
+        // 直接跳转到指定索引
+        info = index;
+        updateView();
+        pause();
+      });
+    });
+
+  </script>
+</body>
+
+</html>
