@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <!-- 为script标签添加type属性，值为module，使该标签模块化。拥有独立作用域，里面的变量和函数都是私有的。 -->
+  <script type="module">/* 随机数 */
+
+    //Math.random() 方法，返回0-1之间随机小数，包括0不包括1
+    console.log(Math.random());
+    //生成0-10的随机数
+    Math.floor(Math.random() * (10 + 1));
+    //生成5-10的随机数
+    Math.floor(Math.random() * (5 + 1)) + 5
+    //生成N-M的随机数
+    // let random2 = Math.floor(Math.random() * (M - N + 1)) + N
+
+    //将N-M封装成一个函数以供调用
+    function getRandom(N, M) {
+      return Math.floor(Math.random() * (M - N + 1)) + N
+    }
+
+    //生成0-length的随机数以供数组使用
+    // 生成 0 到 length (不包含 length，即length-1,不会越界) 的随机整数
+    function getRandomIndex(length) {
+      return Math.floor(Math.random() * length);
+    }
+
+  </script>
+
+  <script type="module">/* 数字补零 */
+    // num.toString().padStart(2, '0');
+    //1 .toString()：将数字转换成字符串。
+    //2 .padStart(2, '0')：检查字符串的长度，长度不足2就用字符串0补至开头。
+  </script>
+
+  <script type="module">/* 日期函数 */
+
+    const date = new Date();
+    // 1. 月份需要 +1 才是当前的实际月份
+    // 2. 使用 .toString().padStart(2, '0') 确保如果是 1-9 的个位数，前面会自动补 0
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const time = date.getHours().toString().padStart(2, '0');
+    const minute = date.getMinutes().toString().padStart(2, '0');
+    const second = date.getSeconds().toString().padStart(2, '0');
+    // 使用模板字符串拼接，代码更清晰易读
+    console.log(`${year}-${month}-${day} ${time}:${minute}:${second}`);
+
+    //时间戳转换
+    let d = parseInt(时间戳秒数 / 60 / 60 / 24) //转换天
+    let h = parseInt(时间戳秒数 / 60 / 60 % 24) //转换小时  
+    let m = parseInt(时间戳秒数 / 60 % 60)      //转换分数
+    let s = parseInt(时间戳秒数 % 60)           //转换当前秒数
+
+  </script>
+
+
+
+</body>
+
+</html>

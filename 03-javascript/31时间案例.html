@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+  <style>
+    .countdown {
+      position: relative;
+      width: 240px;
+      height: 305px;
+      text-align: center;
+      line-height: 1;
+      color: #fff;
+      background-color: brown;
+      /* background-size: 240px; */
+      /* float: left; */
+      overflow: hidden;
+    }
+
+    .countdown .next {
+      font-size: 16px;
+      margin: 25px 0 14px;
+    }
+
+    .countdown .title {
+      font-size: 33px;
+    }
+
+    .countdown .tips {
+      margin-top: 80px;
+      font-size: 23px;
+    }
+
+    .countdown small {
+      font-size: 17px;
+    }
+
+    .countdown .clock {
+      width: 142px;
+      margin: 18px auto 0;
+      overflow: hidden;
+    }
+
+    .countdown .clock span,
+    .countdown .clock i {
+      display: block;
+      text-align: center;
+      line-height: 34px;
+      font-size: 23px;
+      float: left;
+    }
+
+    .countdown .clock span {
+      width: 34px;
+      height: 34px;
+      border-radius: 2px;
+      background-color: #303430;
+    }
+
+    .countdown .clock i {
+      width: 20px;
+      font-style: normal;
+    }
+
+    .countdown .finish {
+      position: absolute;
+      visibility: hidden;
+      width: 150px;
+      height: 80px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #6ed89a;
+      font-size: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="countdown">
+    <p class="next">今天是2000年1月1日</p>
+    <p class="title">倒计时</p>
+    <p class="clock">
+      <span id="hour">00</span>
+      <i>:</i>
+      <span id="minutes">00</span>
+      <i>:</i>
+      <span id="second">00</span>
+    </p>
+    <p class="tips">19:30:00结束</p>
+    <button class="finish">倒计时已结束</button>
+  </div>
+
+  <script>
+    // 获取页面中需要操作的元素
+
+    const countdown = document.querySelector('.countdown');
+    const finish = document.querySelector('.countdown .finish');
+    const pageToday = document.querySelector('.next');
+    const pageHour = document.querySelector('#hour');
+    const pageMinute = document.querySelector('#minutes');
+    const pageSecond = document.querySelector('#second');
+    const pageTips = document.querySelector('.tips');
+    let timeid = null;/*  */
+
+    //实例化当前时间
+    const nowTime = new Date();
+    // const nowTime = new Date(2000, 5, 1, 0, 0, 0);   /* 实例化指定时间，年月为必须参数，后续为可选参数，自动补齐为1，0，0，0 */
+    console.log(nowTime);
+    console.log(`当前时间戳:${+nowTime}`);
+
+    //更新页面时间
+    pageToday.innerText = `今天是${nowTime.getFullYear()}年${nowTime.getMonth() + 1}月${nowTime.getDate()}日`;
+    //设定结束时间
+    const TARGET_HOUR = 20;
+    const TARGET_MINUTE = 30;
+    const TARGET_SECOND = 0;
+    pageTips.innerHTML = `${TARGET_HOUR.toString().padStart(2, '0')}:${TARGET_MINUTE.toString().padStart(2, '0')}:${TARGET_SECOND.toString().padStart(2, '0')}结束`;
+
+    // 封装一个更新页面时间文本的函数
+    function updatePageTime() {
+      const nowTime = new Date();
+      //获取当前时间戳
+      const nowTimeStamp = + nowTime;
+      //获取目标时间戳
+      const targetTimeStamp = + new Date(nowTime.getFullYear(), nowTime.getMonth(), nowTime.getDate(), TARGET_HOUR, TARGET_MINUTE, TARGET_SECOND);
+
+      const remain = targetTimeStamp - nowTimeStamp;
+      if (remain <= 0) {
+        clearInterval(timeid);
+        pageHour.innerText = pageMinute.innerText = pageSecond.innerText = '00';
+        countdown.style.backgroundColor = 'skyblue';
+        finish.style.visibility = 'visible';
+        return;
+      }
+      // const d = parseInt(remain / 60 / 60 / 24);
+      const h = parseInt(remain / 1000 / 60 / 60 % 24);
+      const m = parseInt(remain / 1000 / 60 % 60);
+      const s = parseInt(remain / 1000 % 60);
+
+      pageHour.innerText = h.toString().padStart(2, '0');
+      pageMinute.innerText = m.toString().padStart(2, '0');
+      pageSecond.innerText = s.toString().padStart(2, '0');
+
+    };
+
+    updatePageTime();
+    // 定时器
+    timeid = setInterval(updatePageTime, 1000);
+
+
+  </script>
+</body>
+
+</html>
