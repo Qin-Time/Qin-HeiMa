@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>学生信息管理</title>
+  <link rel="stylesheet" href="css/index.css" />
+</head>
+
+<body>
+  <h1>新增学员</h1>
+  <form class="info" autocomplete="off">
+    姓名：<input type="text" class="uname" name="uname" />
+    年龄：<input type="text" class="age" name="age" />
+    性别:
+    <select name="gender" class="gender">
+      <option value="男">男</option>
+      <option value="女">女</option>
+    </select>
+    薪资：<input type="text" class="salary" name="salary" />
+    就业城市：<select name="city" class="city">
+      <option value="北京">北京</option>
+      <option value="上海">上海</option>
+      <option value="广州">广州</option>
+      <option value="深圳">深圳</option>
+      <option value="曹县">曹县</option>
+    </select>
+    <button class="add">录入</button>
+  </form>
+
+  <h1>就业榜</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>学号</th>
+        <th>姓名</th>
+        <th>年龄</th>
+        <th>性别</th>
+        <th>薪资</th>
+        <th>就业城市</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <!-- <td>1001</td>
+        <td>欧阳霸天</td>
+        <td>19</td>
+        <td>男</td>
+        <td>15000</td>
+        <td>上海</td>
+        <td>
+          <a href="javascript:">删除</a>
+        </td> -->
+
+        <!-- { id: 1001, uname: '欧阳霸天', age: 19, gender: '男', salary: 15000, city: '上海' } -->
+      </tr>
+    </tbody>
+  </table>
+
+  <script>
+
+    // 创建一个对象数组来存储数据//加入提取本地存储功能，将localStorage的json字符串转换（还原）为对象数组
+    let data = JSON.parse(localStorage.getItem('Students')) || [];
+    // 获取页面元素
+    //思考，需要获取哪个元素。录入按钮会触发点击事件，点击录入会抓取各项表单的值，将值装成一个对象放到数组里。
+    //再观察html结构，和录入相关的操作，都是在操作form表单，感觉可以只获取form元素，通过form元素依次获取子代相关元素
+    //和数据展示的相关操作，都是在操作table元素，所以值需要获取table元素
+    const form = document.querySelector('form');
+    const tbody = document.querySelector('tbody');
+
+    // 将主要对象提取出来
+    //思考，如果用querySelector获得元素，代码量最繁琐。如果用form.children[index].value直接将值给对象，依赖html结构的固定。AI给出的form.name.value是最佳实践。（我再去多学习一下form表单在JS的特性）
+    //接收用户提交的数据。就是给button绑定点击事件（委托给form）
+
+    //思考，本案例需要判定用户录入的数据是否完整，form.children[index].value写法也会有点臃肿。还是需要querySelector获得元素用来判断。
+    const uname = document.querySelector('[name = uname]');
+    const age = document.querySelector('[name = age]');
+    const gender = document.querySelector('[name = gender]');
+    const salary = document.querySelector('[name = salary]');
+    const city = document.querySelector('[name = city]');
+
+    // 封装一个渲染表格的函数
+    function render() {
+      tbody.innerHTML = ''; // 每次渲染前先清空旧的，避免数据重复
+      data.forEach((item, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${item.id}</td>
+            <td>${item.uname}</td>
+            <td>${item.age}</td>
+            <td>${item.gender}</td>
+            <td>${item.salary}</td>
+            <td>${item.city}</td>
+            <td><a href="javascript:" data-index="${index}">删除</a></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+    render(); // 页面一打开，先渲染一次初始数据
+
+    //录入功能
+    form.addEventListener('submit', function (e) {
+      e.preventDefault(); // 阻止表单默认的刷新页面行为
+      if (uname.value && age.value && salary.value) {
+        const newId = data.length > 0 ? data[data.length - 1].id + 1 : 1001;
+        const newStudent = {
+          id: newId,
+          uname: uname.value,
+          age: age.value,
+          gender: gender.value,
+          salary: salary.value,
+          city: city.value
+        }
+        data.push(newStudent);
+        localStorage.setItem('Students', JSON.stringify(data));//加入存储本地功能，用JSON.stringify将data整体转换为字符串,再存到localStorage
+        render(); // 数据更新后，重新渲染页面
+        form.reset(); // 录入成功后，一键清空表单
+      }
+      else { alert('请录入完整数据') };
+    });
+    // 删除功能（事件委托）
+    tbody.addEventListener('click', function (e) {
+      if (e.target.tagName === 'A') { // 只有点击到 a 标签时才触发删除
+        const index = e.target.getAttribute('data-index');
+        data.splice(index, 1); // 删除数组里对应的数据
+        localStorage.setItem('Students', JSON.stringify(data));
+        render(); // 重新渲染页面
+      }
+    });
+  </script>
+
+</body>
+
+</html>

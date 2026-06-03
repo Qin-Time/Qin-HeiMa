@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    .list {
+      width: 990px;
+      margin: 100px auto 0;
+    }
+
+    .item {
+      padding: 15px;
+      transition: all .5s;
+      display: flex;
+      border-top: 1px solid #e4e4e4;
+    }
+
+    .item:nth-child(4n) {
+      margin-left: 0;
+    }
+
+    .item:hover {
+      cursor: pointer;
+      background-color: #f5f5f5;
+    }
+
+    .item img {
+      width: 80px;
+      height: 80px;
+      margin-right: 10px;
+    }
+
+    .item .name {
+      font-size: 18px;
+      margin-right: 10px;
+      color: #333;
+      flex: 2;
+    }
+
+    .item .name .tag {
+      display: block;
+      padding: 2px;
+      font-size: 12px;
+      color: #999;
+    }
+
+    .item .price,
+    .item .sub-total {
+      font-size: 18px;
+      color: firebrick;
+      flex: 1;
+    }
+
+    .item .price::before,
+    .item .sub-total::before,
+    .amount::before {
+      content: "¥";
+      font-size: 12px;
+    }
+
+    .item .spec {
+      flex: 2;
+      color: #888;
+      font-size: 14px;
+    }
+
+    .item .count {
+      flex: 1;
+      color: #aaa;
+    }
+
+    .total {
+      width: 990px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: flex-end;
+      border-top: 1px solid #e4e4e4;
+      padding: 20px;
+    }
+
+    .total .amount {
+      font-size: 18px;
+      color: firebrick;
+      font-weight: bold;
+      margin-right: 50px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="list">
+    <!-- 模板 -->
+    <!-- <div class="item">
+      <img src="https://yanxuan-item.nosdn.127.net/84a59ff9c58a77032564e61f716846d6.jpg" alt="">
+      <p class="name">称心如意手摇咖啡磨豆机咖啡豆研磨机 <span class="tag">【赠品】10优惠券</span></p>
+      <p class="spec">白色/10寸</p>
+      <p class="price">289.90</p>
+      <p class="count">x2</p>
+      <p class="sub-total">579.80</p>
+    </div> -->
+  </div>
+  <div class="total">
+    <div>合计：<span class="amount">1000.00</span></div>
+  </div>
+  <script>
+    const goodsList = [
+      {
+        id: '4001172',
+        name: '称心如意手摇咖啡磨豆机咖啡豆研磨机',
+        price: 289.9,
+        picture: 'https://yanxuan-item.nosdn.127.net/84a59ff9c58a77032564e61f716846d6.jpg',
+        count: 2,
+        spec: { color: '白色' }
+      },
+      {
+        id: '4001009',
+        name: '竹制干泡茶盘正方形沥水茶台品茶盘',
+        price: 109.8,
+        picture: 'https://yanxuan-item.nosdn.127.net/2d942d6bc94f1e230763e1a5a3b379e1.png',
+        count: 3,
+        spec: { size: '40cm*40cm', color: '黑色' }
+      },
+      {
+        id: '4001874',
+        name: '古法温酒汝瓷酒具套装白酒杯莲花温酒器',
+        price: 488,
+        picture: 'https://yanxuan-item.nosdn.127.net/44e51622800e4fceb6bee8e616da85fd.png',
+        count: 1,
+        spec: { color: '青色', sum: '一大四小' }
+      },
+      {
+        id: '4001649',
+        name: '大师监制龙泉青瓷茶叶罐',
+        price: 139,
+        picture: 'https://yanxuan-item.nosdn.127.net/4356c9fc150753775fe56b465314f1eb.png',
+        count: 1,
+        spec: { size: '小号', color: '紫色' },
+        gift: '50g茶叶,清洗球'
+      }
+    ]
+
+    //需求，将后台数据经过对应处理渲染到页面上。
+    //思考：页面中需要将后台数据遍历渲染到盒模块上，提取特殊的数据做指定处理
+    //所以遍历的时候调用渲染函数？那特殊的数据怎么独立渲染呢？思路：未来项目中遇到这种情况，是要先做普遍性，再单独做特殊性？还是直接封装一个完整函数里面判断特殊性的发生？
+    //观察本案例不存在特殊性数据，实际上只是数据里有gift的特殊性，渲染上直接把gift的数据整个包到了p标签里，和普通P标签无区别
+    //思考，这个案例中，将gift内的数据遍历拼接成字符串，再嵌进P标签的内容中，那是否我将所有的元素都默认有gift，如果数据传过来的gift是空，也就没有内容嵌进去P
+    //思考，这个案例中，还需要汇总和计算数据，是否需要将数据单独解构出来？其实给的数据根本不是规范的结构，还少了一层对象嵌套和json转换，是练习用的解构过一次的对象数组。所以我根本不需要结构，直接用对象数组。
+
+    function render(goods) {
+      let giftHtml = '';
+      if (goods.hasOwnProperty("gift")) {
+        giftHtml = goods.gift.split(',').map(item => `<span class="tag">【赠品】${item}</span>`).join('');
+      };
+
+      let specHtml = Object.values(goods.spec).join('/');
+      let str = `
+      <div class="item">
+        <img src="${goods.picture}" alt="${goods.name}">
+        <p class="name">${goods.name}${giftHtml ? giftHtml : ''}</p>
+        <p class="spec">${specHtml}</p>
+        <p class="price">${goods.price.toFixed(2)}</p>
+        <p class="count">x${goods.count}</p>
+        <p class="sub-total">${(goods.price * goods.count).toFixed(2)}</p>
+        </div>
+        `
+      return str
+    }
+
+    document.querySelector('.list').innerHTML = goodsList.map(render).join('');
+
+    function total(data) {
+      // 通过arr.reduce累加总和
+      return data.reduce((sum, goods) => sum + goods.price * goods.count, 0).toFixed(2);
+    }
+
+    document.querySelector('.amount').innerHTML = `${total(goodsList)}`;
+  </script>
+</body>
+
+</html>

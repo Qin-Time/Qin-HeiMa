@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>学车在线首页</title>
+  <link rel="stylesheet" href="./css/style.css">
+  <style>
+
+  </style>
+</head>
+
+<body>
+
+  <!-- 4. box核心内容区域开始 -->
+  <div class="box w">
+    <div class="box-hd">
+      <h3>精品推荐</h3>
+      <a href="#">查看全部</a>
+    </div>
+    <div class="box-bd">
+      <ul class="clearfix">
+
+      </ul>
+    </div>
+  </div>
+  <script>
+    //需求，将写死的页面展示重复列表优化成JS循环添加节点。
+
+    //获取UL
+    const ulmain = document.querySelector('.box-bd .clearfix');
+
+    //思考，现在学习阶段，面对的数据都是给好的。但是实际工程中，数据都是后台传过来了json数据。肯定是通过数据文件中提取对象数组相关的属性如对象数组的长度，对象数组的下标，来操作循环。
+    //所以，这个位置我们应该是用for循环？还是用类似for of，for in，还是for each。所以我们要了解需要处理的数据，到底要处理什么内容，键？值？需不需要中断？
+
+    //假定后台传过来一个对象数组
+    let dataDisplayList = [
+      {
+        src: 'images/course01.png',
+        title: 'Think PHP 5.0 博客系统实战项目演练',
+        num: 1125
+      },
+      {
+        src: 'images/course02.png',
+        title: 'Android 网络动态图片加载实战',
+        num: 357
+      },
+      {
+        src: 'images/course03.png',
+        title: 'Angular2 大前端商城实战项目演练',
+        num: 22250
+      },
+      {
+        src: 'images/course04.png',
+        title: 'Android APP 实战项目演练',
+        num: 389
+      },
+      {
+        src: 'images/course05.png',
+        title: 'UGUI 源码深度分析案例',
+        num: 124
+      },
+      {
+        src: 'images/course06.png',
+        title: 'Kami2首页界面切换效果实战演练',
+        num: 432
+      },
+      {
+        src: 'images/course07.png',
+        title: 'UNITY 从入门到精通实战案例',
+        num: 888
+      },
+      {
+        src: 'images/course08.png',
+        title: 'Cocos 深度学习你不会错过的实战',
+        num: 590
+      },
+    ]
+    // 封装一个渲染单个项目的函数
+    function render(obj) {
+      //函数中将对象的属性和值一一对应到需要渲染的标签中。
+      //在UL子集创建一个li
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      const img = document.createElement('img');
+      const h4 = document.createElement('h4');
+      const div = document.createElement('div');
+      const span = document.createElement('span');
+      const span2 = document.createElement('span');
+
+
+      //将对象里的属性更新到li的属性或子代属性上。 
+      a.href = obj.href;
+      img.src = obj.src;
+      h4.innerText = obj.title;
+      span.innerText = `高级●`;
+      span2.innerText = `${obj.num}人在学习`;
+
+      //将元素挂载到相应位置
+      a.appendChild(img);
+      a.appendChild(h4);
+      a.appendChild(div);
+      div.appendChild(span);
+      div.appendChild(span2);
+      li.appendChild(a);
+
+      //思考，这个渲染函数，要在遍历时回调，所以要想好元素插入的位置。另外，是在回调时执行插入，所以就得写在本身这个渲染函数中。不要写错位置。正确的插入时机，插入正确的位置。
+      ulmain.appendChild(li);
+    };
+    //遍历对象数组
+    dataDisplayList.forEach(
+      render
+      //对每个对象执行一次回调函数。遍历当前对象时，将当前对象作为参数传给回调函数。
+    );
+  </script>
+</body>
+
+</html>

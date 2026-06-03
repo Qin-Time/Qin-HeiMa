@@ -115,8 +115,8 @@
     //更新页面时间
     pageToday.innerText = `今天是${nowTime.getFullYear()}年${nowTime.getMonth() + 1}月${nowTime.getDate()}日`;
     //设定结束时间
-    const TARGET_HOUR = 20;
-    const TARGET_MINUTE = 30;
+    const TARGET_HOUR = 12;
+    const TARGET_MINUTE = 0;
     const TARGET_SECOND = 0;
     pageTips.innerHTML = `${TARGET_HOUR.toString().padStart(2, '0')}:${TARGET_MINUTE.toString().padStart(2, '0')}:${TARGET_SECOND.toString().padStart(2, '0')}结束`;
 
@@ -146,7 +146,7 @@
       pageSecond.innerText = s.toString().padStart(2, '0');
 
     };
-
+    // 页面运行
     updatePageTime();
     // 定时器
     timeid = setInterval(updatePageTime, 1000);
