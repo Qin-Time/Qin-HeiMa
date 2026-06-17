@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <h2>ajax登录界面</h2>
+  <form>
+    <div>
+      账号
+      <input type="text" class="username" placeholder="测试限6位字符">
+    </div>
+    <div>
+      密码
+      <input type="password" class="password" placeholder="测试限6位字符">
+    </div>
+    <button type="button" class="btn">登录</button>
+  </form>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    const regex = /^[A-Za-z0-9]{6}$/; // 正则
+    //1登录按钮绑定点击事件，收集表单数据判断是否满足条件
+    document.querySelector(".btn").addEventListener('click', () => {
+      const username = document.querySelector('.username').value;
+      const password = document.querySelector('.password').value;
+      console.log(`收集数据:username:${username} password:${password}`);
+      if (regex.test(username) && regex.test(password)) {
+        console.log("1");
+        // axios({ method: 'POST', url: URL, data: data, config }).then(response => { /* 成功处理逻辑 */ }).catch(error => { /* 失败处理逻辑 */ });  //完整写法
+        // axios.post(URL, data, config).then(response => { /* 成功处理逻辑 */ }).catch(error => { /* 失败处理逻辑 */ });  //语法糖写法
+        axios(
+          {
+            method: "post",
+            url: 'https://hmajax.itheima.net/api/login',
+            data: {
+              username,
+              password
+            }
+          }
+        ).then(response => {
+          console.log(response.data.message);
+        }).catch(error => {
+          console.log(error);
+
+        })
+      }
+    })
+  </script>
+</body>
+
+</html>
