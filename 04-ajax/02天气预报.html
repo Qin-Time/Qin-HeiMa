@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <title>天气页面</title>
+  <link rel="stylesheet" href="./tqcss.css"> <!-- 关联CSS文件 -->
+</head>
+
+<body>
+  <div class="weather-app">
+    <!-- 1. 顶部导航栏 -->
+    <header class="top-bar">
+      <div class="date-info">10月28日 农历 十月初四</div>
+      <div class="city-search">
+        <span class="location-icon">📍</span>
+        <span class="city-name">城市名</span>
+        <input type="text" class="search-input" placeholder="搜索城市">
+        <!-- 【新增】搜索结果列表容器 -->
+        <!-- 放在 header 内部或外部均可，通常放在 search 附近 -->
+        <div class="search-result-container">
+          <ul class="city-list">
+            <!-- li 元素将由 JS 动态生成填充在这里 -->
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <!-- 2. 天气信息区 -->
+    <section class="weather-info">
+      <div class="temp-section">
+        <h1 class="temperature">12°</h1>
+        <span class="aqi-badge">55 良</span>
+      </div>
+      <div class="condition">多云 东南风 2级</div>
+      <div class="detail-list">
+        <span>今天：晴 9 - 14℃</span>
+        <span>紫外线 强</span>
+        <span>湿度 53%</span>
+        <span>日出 06:38</span>
+        <span>日落 17:18</span>
+      </div>
+    </section>
+
+    <!-- 3. 7日内天气预报卡片 -->
+    <section class="forecast-card">
+      <h2 class="forecast-title">7日内天气预报</h2>
+      <div class="forecast-days">
+        <!-- 重复7次“单天预报”结构（示例仅写1个，实际需复制7份） -->
+        <div class="day-item">
+          <div class="day-date">今天<br>10月28日</div>
+          <div class="day-icon">☁️</div> <!-- 天气图标（可用图片/emoji替代） -->
+          <div class="day-condition">多云</div>
+          <div class="day-temp">12 - 12°C</div>
+          <div class="day-wind">东南风 &lt;3级</div>
+        </div>
+        <!-- 其他6天的 day-item 结构与上述一致 -->
+      </div>
+    </section>
+  </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<script src="./tqindex.js"></script>
+
+</html>
