@@ -8,6 +8,8 @@ import router from './router'
 
 // 引入懒加载指令插件
 import { lazyPlugin } from '@/directives'
+// 引入全局组件插件
+import { componentPlugin } from '@/components'
 
 
 const app = createApp(App)
@@ -17,4 +19,5 @@ app.use(router)
 
 app.mount('#app')
 app.use(lazyPlugin)
+app.use(componentPlugin)
 
