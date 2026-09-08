@@ -1,10 +1,11 @@
 import fs from 'node:fs/promises';
+import path from 'node:path';
 
-let path = './成绩.txt';
-let topath = './成绩01.txt'
+let filePath = path.join(import.meta.dirname, './成绩.txt');
+let toPath = path.join(import.meta.dirname, './成绩01.txt');
 
 try {
-  const data = await fs.readFile(path, 'utf8');
+  const data = await fs.readFile(filePath, 'utf8');
 
   // to do transform 
   // 1 按照空格分割数据
@@ -15,7 +16,7 @@ try {
   // 3 把新数组中的每一项，进行合并，得到一个新的字符串
   const newStr = arrNew.join('\r\n')
 
-  await fs.writeFile(topath, newStr);
+  await fs.writeFile(toPath, newStr);
   console.log('写入文件成功');
 
 } catch (error) {
