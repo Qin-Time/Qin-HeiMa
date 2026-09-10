@@ -7,6 +7,8 @@
 
 // 导入express
 import express from 'express'
+// 引入配置
+import config from './config.js';
 // 导入cors跨域中间件
 import cors from 'cors'
 // 导入全局响应中间件
@@ -39,14 +41,14 @@ app.use(authMiddleware({ excludePaths: ['/api/reguser', '/api/login'] }))
 
 // --- 路由注册 ---
 // 将用户路由模块挂载到 /api 路径下
-app.use('/api', userRouter)
+app.use(config.apiPrefix, userRouter)
 
 // --- 全局错误处理中间件 ---
 // 注意：这个中间件必须注册在所有路由之后
 app.use(errorHandler)
 
 // --- 启动服务器 ---
-const PORT = 3007;
-app.listen(PORT, () => {
-  console.log(`✅ api server running at http://127.0.0.1:${PORT}`);
-})
+// 使用配置中的端口和前缀
+app.listen(config.port, () => {
+  console.log(`🚀 服务器运行在 http://localhost:${config.port}`);
+});

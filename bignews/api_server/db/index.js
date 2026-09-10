@@ -11,13 +11,15 @@
 
 // 2. 导入 mysql2 的 promise 版本
 import mysql from 'mysql2/promise';
+import config from '../config.js'; // 引入配置
 
 // 3. 创建数据库连接池
 const pool = mysql.createPool({
-  host: process.env.DB_HOST || '127.0.0.1',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || 'admin123',
-  database: process.env.DB_NAME || 'my_db_01',
+  host: config.db.host || '127.0.0.1',
+  user: config.db.user || 'root',
+  password: config.db.password || 'admin123',
+  database: config.db.database || 'my_db_01',
+  port: config.db.port,
   waitForConnections: true,   // 当连接池满时，等待可用连接
   connectionLimit: 10,        // 连接池最大连接数
   queueLimit: 0,              // 等待队列长度，0表示不限制
