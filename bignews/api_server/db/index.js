@@ -15,10 +15,10 @@ import config from '../config.js'; // 引入配置
 
 // 3. 创建数据库连接池
 const pool = mysql.createPool({
-  host: config.db.host || '127.0.0.1',
-  user: config.db.user || 'root',
-  password: config.db.password || 'admin123',
-  database: config.db.database || 'my_db_01',
+  host: config.db.host,
+  user: config.db.user,
+  password: config.db.password,
+  database: config.db.database,
   port: config.db.port,
   waitForConnections: true,   // 当连接池满时，等待可用连接
   connectionLimit: 10,        // 连接池最大连接数

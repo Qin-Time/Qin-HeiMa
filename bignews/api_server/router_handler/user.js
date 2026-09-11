@@ -11,7 +11,7 @@
 import db from '../db/index.js'
 // 导入密码加密模块
 import bcrypt from 'bcryptjs'
-/* 旧代码块，已抽离到工具函数中
+/* 旧代码块，已抽离到工具函数token中
 // 导入JWT
 import jwt from 'jsonwebtoken'
 // 导入配置文件

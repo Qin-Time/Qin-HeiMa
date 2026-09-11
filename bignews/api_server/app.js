@@ -16,7 +16,7 @@ import responseMiddleware from './middleware/response.js';
 // 导入全局token验证中间件
 import authMiddleware from './middleware/authMiddleware.js';
 // 导入路由模块
-import userRouter from './router/user.js';
+import mainRouter from './router/index.js'
 // 导入全局错误处理中间件
 import errorHandler from './middleware/errorHandler.js'
 
@@ -27,21 +27,18 @@ const app = express();
 
 // 1. 将cors注册为全局中间件，解决跨域问题
 app.use(cors());
-
 // 2. 配置解析中间件，解析 application/x-www-form-urlencoded 格式的表单数据
 app.use(express.urlencoded({ extended: false }))
-// 💡 补充：解析 application/json 格式的数据（前后端分离项目必备）
+// 解析 application/json 格式的数据
 app.use(express.json())
-
 // 3. 注册自定义的统一响应中间件
 app.use(responseMiddleware)
-
-// 注册token验证中间件。  把不需要验证的接口（白名单）传进工程函数，返回一个中间件
+// 4.注册token验证中间件。  把不需要验证的接口（白名单）传进工程函数，返回一个中间件
 app.use(authMiddleware({ excludePaths: ['/api/reguser', '/api/login'] }))
 
 // --- 路由注册 ---
-// 将用户路由模块挂载到 /api 路径下
-app.use(config.apiPrefix, userRouter)
+// 将主路由挂载到根路径
+app.use(mainRouter)
 
 // --- 全局错误处理中间件 ---
 // 注意：这个中间件必须注册在所有路由之后
