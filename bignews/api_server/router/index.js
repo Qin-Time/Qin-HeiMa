@@ -1,5 +1,7 @@
 // router/index.js
+// 导入路由模块
 import { Router } from 'express'
+// 导入子路由
 import userRouter from './user.js'
 // import publicRouter from './public.js'
 // import paymentRouter from './payment.js'

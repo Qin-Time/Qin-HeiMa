@@ -19,16 +19,15 @@ const errorHandler = (err, req, res, next) => {
     httpCode = 401
   }
   // 如果是业务逻辑中主动抛出的自定义错误
-  else if (err instanceof Error && err.message) {
+  else if (err.isOperational) {
     message = err.message
+    httpCode = err.httpCode || 400
   }
-
   // 3. 统一使用 res.cc() 返回错误响应
-  // 💡 注意：这里不需要 return res.cc()，因为已经是最后一步了
-  res.status(httpCode).send({
+  return res.cc({
     status: 1,
-    message: message,
-    data: null
+    message,
+    httpCode
   })
 }
 

@@ -22,10 +22,21 @@ const pool = mysql.createPool({
   port: config.db.port,
   waitForConnections: true,   // 当连接池满时，等待可用连接
   connectionLimit: 10,        // 连接池最大连接数
-  queueLimit: 0,              // 等待队列长度，0表示不限制
+  queueLimit: 100,            // 等待队列长度，0表示不限制
   enableKeepAlive: true,      // 开启心跳，防止数据库因长时间空闲断开连接
   keepAliveInitialDelay: 10000
 });
+
+// 启动时可做一次连接检测
+pool.getConnection()
+  .then(conn => {
+    console.log('数据库连接成功')
+    conn.release()
+  })
+  .catch(err => {
+    console.error('数据库连接失败', err)
+    process.exit(1)
+  })
 
 // 4. 向外导出 db 连接池对象
 export default pool;

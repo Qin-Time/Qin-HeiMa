@@ -26,7 +26,7 @@ const app = express();
 // --- 全局中间件注册 ---
 
 // 1. 将cors注册为全局中间件，解决跨域问题
-app.use(cors());
+app.use(cors({ origin: config.corsOrigin || true, credentials: true }))
 // 2. 配置解析中间件，解析 application/x-www-form-urlencoded 格式的表单数据
 app.use(express.urlencoded({ extended: false }))
 // 解析 application/json 格式的数据

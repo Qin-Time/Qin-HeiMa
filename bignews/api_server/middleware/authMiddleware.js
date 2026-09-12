@@ -25,9 +25,14 @@ export default function authMiddleware(options = {}) {
   // 返回一个真正的 Express 中间件函数
   return (req, res, next) => {
     // 1. 【新增功能】检查当前请求路径是否在白名单内
-    if (excludePaths.includes(req.url)) {
-      return next(); // 在白名单内，直接放行，跳过后续逻辑
-    }
+    const isExcluded = excludePaths.some(p => {
+      if (p.endsWith('/*')) {
+        const prefix = p.slice(0, -1);          // '/api/'
+        return req.path === prefix.slice(0, -1) || req.path.startsWith(prefix);
+      }
+      return req.path === p;
+    });
+    if (isExcluded) return next();
 
     // --------------------------------------------
     // 以下全部都是【原版逻辑】
@@ -39,18 +44,18 @@ export default function authMiddleware(options = {}) {
     // 3. 判断 Token 是否存在
     if (!authHeader) {
       // 没传 Token，直接拦截并返回
-      return res.cc({ status: 1, message: '未提供身份凭证，请先登录' });
+      return res.cc({ status: 1, message: '未提供身份凭证，请先登录', httpCode: 401 });
     }
 
     // 4. 取纯 Token 字符串（因为前端传过来的是 'Bearer xxx'，需要去掉 'Bearer ' 前缀）
-    // 使用 split(' ')[1] 可以安全地截取空格后面的 Token 字符串
-    const token = authHeader.split(' ')[1];
+    // 用三元表达式，支持带前缀或不带前缀两种格式的Token，截取纯Token字符串
+    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : authHeader
 
     // 5. 使用 JWT 验证 Token
     jwt.verify(token, config.jwtSecretKey, (err, decoded) => {
       if (err) {
         // 验证失败（Token 过期、被篡改或无效）  jwt.verify 是异步回调，err 不为空代表验证失败
-        return res.cc({ status: 1, message: 'Token 无效或已过期，请重新登录' });
+        return res.cc({ status: 1, message: 'Token 无效或已过期，请重新登录', httpCode: 401 });
       }
 
       // 6. 验证成功！decoded 里面包含了当初生成 Token 时加密进去的数据（如 { id, username }）

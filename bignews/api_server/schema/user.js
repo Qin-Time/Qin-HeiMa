@@ -27,4 +27,9 @@ const userSchema = z.object({
   username: z.string().regex(/^[a-zA-Z0-9_]{3,20}$/, '用户名必须是3-20位的字母、数字或下划线'),
   password: z.string().regex(/^[\S]{6,20}$/, '密码长度需要符合6-20位')
 });
-export default userSchema;
+// 登录Schema：仅要求非空即可
+const loginSchema = z.object({
+  username: z.string().min(1).max(72),
+  password: z.string().min(1).max(72)
+})
+export { userSchema, loginSchema };

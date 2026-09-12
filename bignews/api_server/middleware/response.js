@@ -22,8 +22,9 @@ const responseMiddleware = (req, res, next) => {
     let finalMessage = message;
     let finalStatus = status;
     if (data instanceof Error) {
-      finalMessage = data.message;
-      finalStatus = 1;
+      finalMessage = data.message
+      finalStatus = 1
+      data = null
     }
 
     return res.status(httpCode).send({
