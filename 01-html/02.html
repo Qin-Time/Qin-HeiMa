@@ -1,0 +1,2638 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>画布-演示</title>
+  <style>
+    @font-face {
+      font-family: 'PingFangSC';
+      font-style: normal;
+      font-weight: 400;
+      src: local('PingFangSC-Regular'), local('PingFang SC Regular'), local('.PingFangSC-Regular'), local('.PingFang SC Regular'), local('PingFangSC'), local('PingFang SC'), url('https://modao.cc/mb-sigma/fonts/zh-CN/PingFangSC/Regular.woff2') format('woff2');
+      font-display: swap
+    }
+
+    @font-face {
+      font-family: 'PingFangSC';
+      font-style: normal;
+      font-weight: 700;
+      src: local('PingFangSC-Semibold'), local('PingFang SC Semibold'), local('.PingFangSC-Semibold'), local('.PingFang SC Semibold'), url('https://modao.cc/mb-sigma/fonts/zh-CN/PingFangSC/SemiBold.woff2') format('woff2');
+      font-display: swap
+    }
+
+    @font-face {
+      font-family: 'SourceHanSansSC';
+      font-style: normal;
+      font-weight: 400;
+      src: local('SourceHanSansSC-Regular'), local('思源黑体 Regular'), local('.SourceHanSansSC-Regular'), local('.思源黑体 Regular'), local('SourceHanSansSC'), local('思源黑体'), url('https://modao.cc/mb-sigma/fonts/zh-CN/SourceHanSansSC/Regular.woff2') format('woff2');
+      font-display: swap
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    :not(input) {
+      user-select: none;
+      -webkit-user-select: none
+    }
+
+    body {
+      background-color: #EFEFEF
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      color: rgb(82, 94, 113);
+      font-family: -apple-system, "SF UI Text", "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Zen Hei", sans-serif;
+      font-size: 12px;
+      line-height: 18px
+    }
+
+    button,
+    select {
+      cursor: pointer
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+      color: inherit
+    }
+
+    button.mb-wrapper,
+    button.mb-icon {
+      appearance: none;
+      border: 0;
+      margin: 0;
+      background: transparent;
+      color: inherit
+    }
+
+    p {
+      margin: 0
+    }
+
+    .mb-visually-hidden {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0, 0, 0, 0) !important;
+      white-space: nowrap !important;
+      border: 0 !important
+    }
+
+    .mb-document,
+    main.mb-page {
+      position: relative
+    }
+
+    main.mb-page {
+      box-sizing: border-box
+    }
+
+    .mb-canvas {
+      position: relative;
+      overflow: hidden
+    }
+
+    .mb-route-canvas[hidden] {
+      display: none !important
+    }
+
+    .mb-overlay {
+      position: fixed;
+      z-index: 2147483647
+    }
+
+    .mb-runtime-overlay-root {
+      position: fixed;
+      inset: 0;
+      z-index: 2147483647;
+      pointer-events: none
+    }
+
+    .mb-runtime-overlay-root>* {
+      pointer-events: auto
+    }
+
+    .mb-runtime-overlay-backdrop {
+      position: absolute;
+      inset: 0;
+      pointer-events: auto
+    }
+
+    .mb-runtime-drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+      background: transparent;
+      pointer-events: auto
+    }
+
+    .mb-overlay-border {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none
+    }
+
+    .mb-node {
+      position: absolute;
+      transform-origin: center center
+    }
+
+    .mb-container-content {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background: transparent
+    }
+
+    .mb-container-content.mb-isClipContent {
+      overflow: hidden
+    }
+
+    .mb-rich-text {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+      white-space: pre-wrap;
+      word-break: break-word;
+      word-wrap: break-word
+    }
+
+    .mb-wButton,
+    .mb-wIconButton {
+      appearance: none;
+      margin: 0;
+      padding: 0;
+      color: inherit;
+      font: inherit
+    }
+
+    .mb-button-wrapper {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      align-items: center;
+      justify-content: center
+    }
+
+    .mb-icon-right {
+      flex-direction: row-reverse
+    }
+
+    .mb-button-icon {
+      display: flex;
+      flex-shrink: 0
+    }
+
+    .mb-button-icon+.mb-rich-text {
+      padding: 0 !important;
+      width: fit-content !important
+    }
+
+    .mb-icon-svg.mb-fill {
+      fill: currentColor
+    }
+
+    .mb-image-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      border-radius: inherit;
+      -webkit-user-drag: none
+    }
+
+    .mb-wImage>.mb-image-wrapper {
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      overflow: hidden;
+      user-select: none
+    }
+
+    .mb-image {
+      position: absolute;
+      display: block;
+      max-width: none
+    }
+
+    .mb-form-control {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      padding: 0 8px;
+      border: 0;
+      border-radius: inherit;
+      outline: 0;
+      background: inherit;
+      color: inherit;
+      font: inherit;
+      text-align: inherit
+    }
+
+    .mb-selection-control {
+      display: flex;
+      flex-flow: row wrap;
+      align-items: flex-start;
+      align-content: space-between
+    }
+
+    .mb-selection-option {
+      display: flex;
+      position: relative;
+      align-items: center;
+      overflow: hidden;
+      white-space: nowrap
+    }
+
+    .mb-selection-option input {
+      appearance: none;
+      flex: none;
+      margin: 0 8px 0 0;
+      border: 1px solid;
+      background-clip: content-box;
+      cursor: pointer;
+      width: 1em;
+      height: 1em
+    }
+
+    .mb-selection-option input[type='radio'] {
+      border-radius: 50%
+    }
+
+    .mb-selection-option input[type='checkbox'] {
+      border-radius: 12.5%;
+      background-clip: border-box
+    }
+
+    .mb-selection-option input.mb-checked[type='radio'] {
+      padding: calc(1em/5.3)
+    }
+
+    .mb-chart-data {
+      width: 100%;
+      height: 100%
+    }
+
+    .mb-tooltip {
+      overflow: visible
+    }
+
+    .mb-tooltip-arrow {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      left: 50%;
+      bottom: -5px;
+      transform: rotate(45deg);
+      background: inherit
+    }
+
+    .mb-tooltip-content {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      align-items: center;
+      justify-content: center
+    }
+
+    .mb-switch-control {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      align-items: center
+    }
+
+    .mb-switch-control>input {
+      position: absolute;
+      opacity: 0
+    }
+
+    .mb-switch-track {
+      width: 100%;
+      height: 100%;
+      border-radius: 999px;
+      background: #c7c7cc
+    }
+
+    .mb-switch-thumb {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      height: calc(100% - 4px);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 3px #0003
+    }
+
+    .mb-status-bar {
+      display: flex !important;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 8px
+    }
+
+    .mb-file-input,
+    .mb-media,
+    .mb-audio-control,
+    .mb-slider-control,
+    .mb-webpage-frame {
+      width: 100%;
+      height: 100%;
+      border: 0
+    }
+
+    .mb-map-grid {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(30deg, transparent 48%, #dce3dc 49% 51%, transparent 52%), linear-gradient(-30deg, #eef2ed 48%, #dce3dc 49% 51%, #eef2ed 52%);
+      background-size: 36px 36px
+    }
+
+    .mb-map-pin {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      color: #e44335;
+      font-size: 24px;
+      transform: translate(-50%, -50%)
+    }
+
+    .mb-table {
+      width: 100%;
+      height: 100%;
+      border-collapse: collapse
+    }
+
+    .mb-table td {
+      border: 1px solid #d9dde3;
+      padding: 4px
+    }
+
+    .mb-search-control,
+    .mb-stepper-control,
+    .mb-pagination,
+    .mb-segmented,
+    .mb-tabs-list {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      align-items: center
+    }
+
+    .mb-search-control {
+      gap: 6px;
+      padding: 0 8px
+    }
+
+    .mb-search-control input {
+      min-width: 0;
+      flex: 1;
+      border: 0;
+      outline: 0;
+      background: transparent
+    }
+
+    .mb-stepper-control>* {
+      display: grid;
+      height: 100%;
+      place-items: center
+    }
+
+    .mb-stepper-control output {
+      flex: 1
+    }
+
+    .mb-menu ul {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      list-style: none
+    }
+
+    .mb-menu li {
+      flex: 1
+    }
+
+    .mb-menu button {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: transparent
+    }
+
+    .mb-collapse {
+      width: 100%;
+      height: 100%;
+      overflow: auto
+    }
+
+    .mb-collapse summary {
+      padding: 6px
+    }
+
+    .mb-shape-svg,
+    .mb-line-svg,
+    .mb-arrow-svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible
+    }
+
+    .mb-shape-svg polygon {
+      fill: currentColor
+    }
+
+    .mb-line-svg line,
+    .mb-arrow-svg line {
+      stroke: currentColor;
+      stroke-width: 2
+    }
+
+    .mb-arrow-svg marker path {
+      fill: currentColor
+    }
+
+    .mb-placeholder-content {
+      display: grid;
+      width: 100%;
+      height: 100%;
+      place-items: center
+    }
+
+    .mb-code-content,
+    .mb-markdown-content {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: auto;
+      padding: 8px;
+      white-space: pre-wrap
+    }
+
+    .mb-keyboard-keys {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      flex-wrap: wrap;
+      gap: 4px;
+      padding: 6px
+    }
+
+    .mb-keyboard-keys kbd {
+      display: grid;
+      flex: 1 0 8%;
+      place-items: center;
+      border: 1px solid #bbb;
+      border-radius: 3px;
+      background: #fff;
+      box-shadow: 0 1px 1px #0003
+    }
+
+    .mb-swimlane-title {
+      height: 28px;
+      padding: 4px;
+      border-bottom: 1px solid currentColor
+    }
+
+    .mb-flow-label {
+      display: grid;
+      width: 100%;
+      height: 100%;
+      place-items: center
+    }
+
+    .mb-tree-list,
+    .mb-mind-list {
+      margin: 0;
+      padding: 8px 8px 8px 24px
+    }
+
+    .mb-graph-surface {
+      width: 100%;
+      height: 100%;
+      background-image: radial-gradient(#aeb4bc 1px, transparent 1px);
+      background-size: 12px 12px
+    }
+
+    .mb-tree-node.mb-wLr {
+      background: rgba(255, 140, 25, 0.15) !important;
+      border: 1px solid #FF8C19 !important
+    }
+
+    .mb-tree-node[hidden] {
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none
+    }
+
+    .mb-canClickableHighWidget {
+      cursor: pointer
+    }
+
+    @keyframes mbInteractionHighlightFlash {
+
+      0%,
+      100% {
+        outline-color: transparent;
+        background-color: transparent
+      }
+
+      20%,
+      60% {
+        outline-color: #ff8c19;
+        background-color: rgba(255, 140, 25, 0.15)
+      }
+
+      40%,
+      80% {
+        outline-color: rgba(255, 140, 25, 0.18)
+      }
+    }
+
+    .mb-interaction-highlight {
+      position: fixed;
+      z-index: 2147483647;
+      pointer-events: none;
+      outline: 1px solid transparent;
+      outline-offset: -1px;
+      animation: mbInteractionHighlightFlash ease-in-out 0.6s
+    }
+
+    .mb-interaction-highlight-root {
+      position: fixed;
+      inset: 0;
+      z-index: 2147483647;
+      pointer-events: none
+    }
+
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background-color: rgb(222, 224, 226);
+      border-radius: 4px
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background-color: rgba(0, 18, 38, 0.3)
+    }
+
+    .mb-rResCanvas>.mb-canvas-viewport {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      contain: layout;
+      display: flex;
+      flex-direction: column
+    }
+
+    .mb-rResCanvas>.mb-canvas-viewport>.mb-container-content {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%
+    }
+
+    .mb-rResCanvas>.mb-canvas-viewport>.mb-container-content.mb-isClipContent {
+      overflow: hidden
+    }
+
+    .mb-wBasket.mb-basket-hide-scrollbar {
+      scrollbar-width: none
+    }
+
+    .mb-wBasket.mb-basket-hide-scrollbar::-webkit-scrollbar {
+      display: none
+    }
+
+    .mb-rich-text p,
+    .mb-rich-text h1,
+    .mb-rich-text h2,
+    .mb-rich-text h3,
+    .mb-rich-text h4,
+    .mb-rich-text h5,
+    .mb-rich-text h6,
+    .mb-rich-text blockquote,
+    .mb-rich-text pre {
+      margin-top: 0
+    }
+
+    .mb-rich-text>:last-child {
+      margin-bottom: 0
+    }
+
+    .mb-wIcon .mb-svg-icon-path-icon {
+      width: 100%;
+      height: 100%;
+      vertical-align: top
+    }
+
+    .mb-wIcon .mb-svg-icon-path-icon.mb-fill {
+      fill: var(--mb-icon-fill)
+    }
+
+    .mb-wIcon .mb-svg-icon-path-icon.mb-fill g [fill]:not([fill='none']) {
+      fill: var(--mb-icon-fill);
+      stroke: none
+    }
+
+    .mb-wIcon .mb-svg-icon-path-icon.mb-fill g [stroke]:not([stroke='none']) {
+      stroke: var(--mb-icon-fill);
+      fill: none
+    }
+
+    .mb-wIcon .mb-svg-icon-path-icon.mb-fill g [fill='none'][stroke] {
+      fill: none;
+      stroke: var(--mb-icon-fill)
+    }
+
+    .mb-wIcon .mb-svg-icon-path-icon.mb-fill g [stroke='none'][fill] {
+      stroke: none;
+      fill: var(--mb-icon-fill)
+    }
+
+    .mb-s-1mkm6w5 {
+      background: rgba(255, 255, 255, 1);
+      border-radius: 0px
+    }
+
+    .mb-s-1a1q4kg {
+      background: rgba(255, 255, 255, 0);
+      border-radius: 0px
+    }
+
+    .mb-s-1340zf0 {
+      border-radius: 0px;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .mb-s-kw9ed0 {
+      background: rgba(254, 240, 240, 1);
+      border-color: rgba(251, 196, 196, 1);
+      border-style: solid;
+      border-width: 1px 1px 1px 1px;
+      border-radius: 4px;
+      color: rgba(245, 108, 108, 1);
+      font-family: PingFangSC;
+      font-size: 14px;
+      font-weight: 400;
+      font-style: normal;
+      line-height: 20px;
+      letter-spacing: 0px;
+      text-align: left;
+      text-decoration: none;
+      writing-mode: horizontal-tb;
+      padding-top: 0px;
+      padding-right: 0px;
+      padding-bottom: 0px;
+      padding-left: 0px;
+      align-items: flex-start;
+      justify-content: center
+    }
+
+    .mb-s-aa16mw {
+      background: rgba(253, 246, 236, 1);
+      border-color: rgba(245, 218, 177, 1);
+      border-style: solid;
+      border-width: 1px 1px 1px 1px;
+      border-radius: 4px;
+      color: rgba(230, 162, 60, 1);
+      font-family: PingFangSC;
+      font-size: 14px;
+      font-weight: 400;
+      font-style: normal;
+      line-height: 20px;
+      letter-spacing: 0px;
+      text-align: left;
+      text-decoration: none;
+      writing-mode: horizontal-tb;
+      padding-top: 0px;
+      padding-right: 0px;
+      padding-bottom: 0px;
+      padding-left: 0px;
+      align-items: flex-start;
+      justify-content: center
+    }
+
+    .mb-s-1ex8mot {
+      background: rgba(244, 244, 245, 1);
+      border-color: rgba(211, 212, 214, 1);
+      border-style: solid;
+      border-width: 1px 1px 1px 1px;
+      border-radius: 4px;
+      color: rgba(144, 147, 153, 1);
+      font-family: PingFangSC;
+      font-size: 14px;
+      font-weight: 400;
+      font-style: normal;
+      line-height: 20px;
+      letter-spacing: 0px;
+      text-align: left;
+      text-decoration: none;
+      writing-mode: horizontal-tb;
+      padding-top: 0px;
+      padding-right: 0px;
+      padding-bottom: 0px;
+      padding-left: 0px;
+      align-items: flex-start;
+      justify-content: center
+    }
+
+    .mb-s-xamaea {
+      background: rgba(240, 249, 235, 1);
+      border-color: rgba(194, 231, 176, 1);
+      border-style: solid;
+      border-width: 1px 1px 1px 1px;
+      border-radius: 4px;
+      color: rgba(103, 194, 58, 1);
+      font-family: PingFangSC;
+      font-size: 14px;
+      font-weight: 400;
+      font-style: normal;
+      line-height: 20px;
+      letter-spacing: 0px;
+      text-align: left;
+      text-decoration: none;
+      writing-mode: horizontal-tb;
+      padding-top: 0px;
+      padding-right: 0px;
+      padding-bottom: 0px;
+      padding-left: 0px;
+      align-items: flex-start;
+      justify-content: center
+    }
+
+    .mb-s-1sn24p8 {
+      background: rgba(236, 245, 255, 1);
+      border-color: rgba(179, 216, 255, 1);
+      border-style: solid;
+      border-width: 1px 1px 1px 1px;
+      border-radius: 4px;
+      color: rgba(64, 158, 255, 1);
+      font-family: PingFangSC;
+      font-size: 14px;
+      font-weight: 400;
+      font-style: normal;
+      line-height: 20px;
+      letter-spacing: 0px;
+      text-align: left;
+      text-decoration: none;
+      writing-mode: horizontal-tb;
+      padding-top: 0px;
+      padding-right: 0px;
+      padding-bottom: 0px;
+      padding-left: 0px;
+      align-items: flex-start;
+      justify-content: center
+    }
+
+    .mb-s-pfm6zs {
+      background: rgba(236, 245, 255, 1);
+      border-color: rgba(179, 216, 255, 1);
+      border-style: solid;
+      border-width: 1px 1px 1px 1px;
+      border-radius: 4px;
+      color: rgba(64, 158, 255, 1);
+      font-family: PingFangSC;
+      font-size: 14px;
+      font-weight: 400;
+      font-style: normal;
+      line-height: 20px;
+      letter-spacing: 0px;
+      text-align: right;
+      text-decoration: none;
+      writing-mode: horizontal-tb;
+      padding-top: 0px;
+      padding-right: 0px;
+      padding-bottom: 0px;
+      padding-left: 0px;
+      align-items: flex-end;
+      justify-content: center
+    }
+
+    .mb-s-17c7l1c {
+      background: rgba(64, 158, 255, 1);
+      border-radius: 4px;
+      color: rgba(255, 255, 255, 1);
+      font-family: PingFangSC;
+      font-size: 14px;
+      font-weight: 400;
+      font-style: normal;
+      line-height: 20px;
+      letter-spacing: 0px;
+      text-align: center;
+      text-decoration: none;
+      writing-mode: horizontal-tb;
+      padding-top: 0px;
+      padding-right: 0px;
+      padding-bottom: 0px;
+      padding-left: 0px;
+      align-items: center;
+      justify-content: center
+    }
+
+    .mb-s-1vevca6 {
+      background: rgba(102, 177, 255, 1);
+      border-radius: 4px;
+      color: rgba(255, 255, 255, 1);
+      font-family: PingFangSC;
+      font-size: 14px;
+      font-weight: 400;
+      font-style: normal;
+      line-height: 20px;
+      letter-spacing: 0px;
+      text-align: center;
+      text-decoration: none;
+      writing-mode: horizontal-tb;
+      padding-top: 0px;
+      padding-right: 0px;
+      padding-bottom: 0px;
+      padding-left: 0px;
+      align-items: center;
+      justify-content: center
+    }
+
+    .mb-s-d3f8nu {
+      color: rgba(145, 145, 145, 1);
+      font-family: PingFangSC;
+      font-size: 14px;
+      font-weight: 400;
+      font-style: normal;
+      line-height: 20px;
+      letter-spacing: 1px;
+      text-align: left;
+      text-decoration: none;
+      writing-mode: horizontal-tb;
+      padding-top: 0px;
+      padding-right: 0px;
+      padding-bottom: 0px;
+      padding-left: 0px;
+      align-items: flex-start;
+      justify-content: flex-start;
+      white-space: break-spaces
+    }
+
+    .mb-s-19vrot9 {
+      border-radius: 4px 0px 0px 4px;
+      color: #bec2c9
+    }
+
+    .mb-s-1tw355 {
+      color: #101010;
+      font-family: PingFangSC;
+      font-size: 16px;
+      font-weight: 400;
+      font-style: normal;
+      line-height: 23px;
+      letter-spacing: 1px;
+      text-align: left;
+      text-decoration: none;
+      writing-mode: horizontal-tb;
+      padding-top: 0px;
+      padding-right: 0px;
+      padding-bottom: 0px;
+      padding-left: 0px;
+      align-items: flex-start;
+      justify-content: flex-start;
+      white-space: pre
+    }
+
+    .mb-s-11m2r0v {
+      background: rgba(255, 255, 255, 1);
+      border-color: rgba(228, 231, 237, 1);
+      border-style: solid;
+      border-width: 1px 1px 1px 1px;
+      border-radius: 4px;
+      box-shadow: 0px 4px 12px 2px rgba(0, 0, 0, 0.039)
+    }
+
+    .mb-s-1iwpfv2 {
+      background: rgba(255, 255, 255, 1);
+      border-color: rgba(220, 223, 230, 1);
+      border-style: solid;
+      border-width: 1px 1px 1px 1px;
+      border-radius: 0px 6px 6px 0px;
+      color: rgba(16, 16, 16, 1);
+      font-family: PingFangSC;
+      font-size: 14px;
+      font-weight: 400;
+      font-style: normal;
+      line-height: 20px;
+      letter-spacing: 0px;
+      text-decoration: none;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      text-align: center;
+      padding: 0px 0px 0px 0px
+    }
+
+    .mb-s-10e8raj {
+      background: rgba(255, 255, 255, 1);
+      border-color: rgba(220, 223, 230, 1);
+      border-style: solid;
+      border-width: 1px 1px 1px 1px;
+      border-radius: 0px 6px 6px 0px;
+      color: rgba(32, 160, 255, 1);
+      font-family: PingFangSC;
+      font-size: 14px;
+      font-weight: 400;
+      font-style: normal;
+      line-height: 20px;
+      letter-spacing: 0px;
+      text-decoration: none;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      text-align: center;
+      padding: 0px 0px 0px 0px
+    }
+
+    .mb-s-yewv2k {
+      background: rgba(64, 158, 255, 1);
+      border-radius: 6px 0px 0px 6px;
+      color: rgba(255, 255, 255, 1);
+      font-family: PingFangSC;
+      font-size: 14px;
+      font-weight: 400;
+      font-style: normal;
+      line-height: 20px;
+      letter-spacing: 0px;
+      text-decoration: none;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      text-align: center;
+      padding: 0px 0px 0px 0px
+    }
+
+    .mb-s-17zfjq0 {
+      color: rgba(38, 38, 38, 1);
+      font-family: PingFangSC;
+      font-size: 14px;
+      font-weight: 400;
+      font-style: normal;
+      line-height: 20px;
+      letter-spacing: 0px;
+      text-align: left;
+      text-decoration: none;
+      writing-mode: horizontal-tb;
+      padding-top: 0px;
+      padding-right: 0px;
+      padding-bottom: 0px;
+      padding-left: 0px;
+      align-items: flex-start;
+      justify-content: flex-start;
+      white-space: pre
+    }
+
+    .mb-s-1pvhpbb {
+      background: rgba(230, 247, 255, 1);
+      border-radius: 0px
+    }
+
+    .mb-s-pzdiow {
+      background: rgba(255, 255, 255, 1);
+      border-color: rgba(220, 224, 231, 1);
+      border-style: solid;
+      border-width: 1px 1px 1px 1px;
+      border-radius: 0px
+    }
+
+    .mb-s-lxoip {
+      color: rgba(193, 194, 197, 1);
+      font-family: PingFangSC;
+      font-size: 14px;
+      font-weight: 400;
+      font-style: normal;
+      line-height: 20px;
+      letter-spacing: 0px;
+      text-align: left;
+      text-decoration: none;
+      writing-mode: horizontal-tb;
+      padding-top: 0px;
+      padding-right: 0px;
+      padding-bottom: 0px;
+      padding-left: 0px;
+      align-items: flex-start;
+      justify-content: flex-start;
+      white-space: pre
+    }
+
+    .mb-s-1so1iy4 {
+      background: rgba(64, 158, 255, 1);
+      border-radius: 4px 0px 0px 4px;
+      color: rgba(255, 255, 255, 1);
+      font-family: PingFangSC;
+      font-size: 14px;
+      font-weight: 400;
+      font-style: normal;
+      line-height: 20px;
+      letter-spacing: 0px;
+      text-align: center;
+      text-decoration: none;
+      writing-mode: horizontal-tb;
+      padding-top: 0px;
+      padding-right: 0px;
+      padding-bottom: 0px;
+      padding-left: 0px;
+      align-items: center;
+      justify-content: center
+    }
+
+    .mb-s-orrshu {
+      background: rgba(102, 177, 255, 1);
+      border-radius: 4px 0px 0px 4px;
+      color: rgba(255, 255, 255, 1);
+      font-family: PingFangSC;
+      font-size: 14px;
+      font-weight: 400;
+      font-style: normal;
+      line-height: 20px;
+      letter-spacing: 0px;
+      text-align: center;
+      text-decoration: none;
+      writing-mode: horizontal-tb;
+      padding-top: 0px;
+      padding-right: 0px;
+      padding-bottom: 0px;
+      padding-left: 0px;
+      align-items: center;
+      justify-content: center
+    }
+
+    .mb-s-139k8gv {
+      background: rgba(64, 158, 255, 1);
+      border-radius: 0px 4px 4px 0px
+    }
+
+    .mb-s-1wmedkn {
+      background: rgba(255, 255, 255, 1);
+      border-radius: 0px;
+      color: rgba(16, 16, 16, 1);
+      font-family: PingFangSC;
+      font-size: 14px;
+      font-weight: 400;
+      font-style: normal;
+      line-height: 20px;
+      letter-spacing: 0px;
+      text-align: center;
+      text-decoration: none;
+      writing-mode: horizontal-tb;
+      padding-top: 6px;
+      padding-right: 6px;
+      padding-bottom: 6px;
+      padding-left: 6px;
+      align-items: center;
+      justify-content: center
+    }
+
+    .mb-s-1lu19iq {
+      background: rgba(236, 245, 255, 1);
+      border-radius: 0px;
+      color: rgba(56, 148, 255, 1);
+      font-family: PingFangSC;
+      font-size: 14px;
+      font-weight: 400;
+      font-style: normal;
+      line-height: 20px;
+      letter-spacing: 0px;
+      text-align: center;
+      text-decoration: none;
+      writing-mode: horizontal-tb;
+      padding-top: 6px;
+      padding-right: 6px;
+      padding-bottom: 6px;
+      padding-left: 6px;
+      align-items: center;
+      justify-content: center
+    }
+
+    .mb-s-gez80i {
+      background: rgba(255, 255, 255, 1);
+      border-radius: 0px;
+      color: rgba(145, 145, 145, 1);
+      font-family: PingFangSC;
+      font-size: 14px;
+      font-weight: 400;
+      font-style: normal;
+      line-height: 20px;
+      letter-spacing: 0px;
+      text-align: center;
+      text-decoration: none;
+      writing-mode: horizontal-tb;
+      padding-top: 6px;
+      padding-right: 6px;
+      padding-bottom: 6px;
+      padding-left: 6px;
+      align-items: center;
+      justify-content: center
+    }
+
+    .mb-s-b3fo4j {
+      background: rgba(255, 255, 255, 1);
+      border-color: rgba(235, 237, 240, 1);
+      border-style: solid;
+      border-width: 1px 1px 1px 1px;
+      border-radius: 3px;
+      box-shadow: 0px 1px 6px 0px rgba(0, 0, 0, 0.102)
+    }
+
+    .mb-s-174fcat {
+      border-radius: 0px;
+      color: #bec2c9
+    }
+
+    .mb-s-7pr3ez {
+      background: rgba(255, 255, 255, 1);
+      border-radius: 0px;
+      color: #101010;
+      font-family: PingFangSC;
+      font-size: 14px;
+      font-weight: 400;
+      font-style: normal;
+      line-height: 20px;
+      letter-spacing: 0px;
+      text-align: left;
+      text-decoration: none;
+      writing-mode: horizontal-tb;
+      padding-top: 6px;
+      padding-right: 6px;
+      padding-bottom: 6px;
+      padding-left: 6px;
+      align-items: flex-start;
+      justify-content: center
+    }
+
+    .mb-s-1sv5s3j {
+      background: rgba(255, 255, 255, 1);
+      border-radius: 4px;
+      color: rgba(64, 149, 229, 1);
+      font-family: PingFangSC;
+      font-size: 14px;
+      font-weight: 400;
+      font-style: normal;
+      line-height: 20px;
+      letter-spacing: 0px;
+      text-align: center;
+      text-decoration: none;
+      writing-mode: horizontal-tb;
+      padding-top: 0px;
+      padding-right: 0px;
+      padding-bottom: 0px;
+      padding-left: 0px;
+      align-items: center;
+      justify-content: center
+    }
+
+    .mb-rs-stkc55 {
+      line-height: 17px
+    }
+
+    .mb-rs-62z12g {
+      font-size: 12px;
+      line-height: 17px
+    }
+
+    .mb-rs-3k43qe {
+      line-height: 30px
+    }
+
+    .mb-rs-da01c7 {
+      line-height: 20px
+    }
+
+    .mb-rs-11ex8ud {
+      color: rgba(24, 144, 255, 1)
+    }
+
+    .mb-rs-19qbd7q {
+      color: rgba(64, 158, 255, 1)
+    }
+
+    .mb-rs-pp5eht {
+      color: rgba(245, 108, 108, 1)
+    }
+
+    .mb-rs-17k7lca {
+      color: rgba(230, 162, 60, 1)
+    }
+
+    .mb-rs-194ow58 {
+      color: rgba(144, 147, 153, 1)
+    }
+
+    .mb-rs-1tdyrbl {
+      color: rgba(103, 194, 58, 1)
+    }
+
+    .mb-rs-13xwn5e {
+      color: rgba(145, 145, 145, 1);
+      font-size: 14px;
+      letter-spacing: 1.0px;
+      line-height: 20px
+    }
+
+    .mb-rs-18nf16q {
+      line-height: 23px
+    }
+
+    .mb-rs-wxpv4b {
+      font-size: 16px;
+      letter-spacing: 1.0px;
+      line-height: 23px
+    }
+
+    .mb-rs-19cty71 {
+      color: rgba(38, 38, 38, 1)
+    }
+
+    .mb-rs-1qtw4ro {
+      color: rgba(193, 194, 197, 1)
+    }
+
+    .mb-rs-1iargvh {
+      color: rgba(16, 16, 16, 1)
+    }
+
+    .mb-rs-17q22hu {
+      color: rgba(56, 148, 255, 1)
+    }
+
+    .mb-rs-16gayjm {
+      color: rgba(145, 145, 145, 1)
+    }
+
+    .mb-rs-edyxrp {
+      color: rgba(64, 149, 229, 1)
+    }
+
+    /* ============================================================
+   用户指定修改：顶部白条吸顶 sticky，左侧导航和右下AI按钮 fixed
+   以下覆盖规则仅调整定位方式，不改变原有元素尺寸、颜色、层级关系
+   ============================================================ */
+
+    /* 1) 最顶白条：吸顶 sticky —— 包含顶部导航菜单、搜索框、头像等 */
+    #mb-1d1zpuz,
+    #mb-wnk6us,
+    #mb-wh2f8e,
+    #mb-17em5zr {
+      position: sticky !important;
+      top: 0 !important;
+      z-index: 1000 !important;
+    }
+
+    /* 顶部导航菜单群组（含搜索框、下拉菜单、头像）固定在白条上方 */
+    #mb-1d1zpuz {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      width: 100% !important;
+      height: 99px !important;
+      z-index: 1002 !important;
+      pointer-events: none;
+    }
+
+    #mb-1d1zpuz>* {
+      pointer-events: auto;
+    }
+
+    /* 顶部白条背景矩形 */
+    #mb-wh2f8e {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      width: 100% !important;
+      height: 99px !important;
+      z-index: 1001 !important;
+    }
+
+    /* 顶部白条左侧的装饰图片 */
+    #mb-17em5zr {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      z-index: 1001 !important;
+    }
+
+    /* 2) 左侧导航：固定 fixed */
+    #mb-1yya1y5 {
+      position: fixed !important;
+      left: 0 !important;
+      top: 99px !important;
+      width: 202px !important;
+      height: calc(100vh - 99px) !important;
+      max-height: 500px !important;
+      z-index: 999 !important;
+    }
+
+    #mb-1yya1y5>.mb-wBasket {
+      width: 202px !important;
+      height: 500px !important;
+    }
+
+    /* 3) 右下角 AI 按钮：固定 fixed */
+    #mb-c4c69c {
+      position: fixed !important;
+      right: 32px !important;
+      bottom: 32px !important;
+      left: auto !important;
+      top: auto !important;
+      width: 48px !important;
+      height: 48px !important;
+      z-index: 1003 !important;
+    }
+
+    #mb-c4c69c>#mb-xrpsd3 {
+      left: 0 !important;
+      top: 0 !important;
+    }
+
+    #mb-c4c69c>#mb-1bec5ko {
+      left: 12px !important;
+      top: 52px !important;
+    }
+
+    /* 4) 其他 fixed-region 元素：下拉菜单与头像，保持 fixed 跟随白条 */
+    #mb-sqehlt,
+    #mb-fosafk {
+      position: fixed !important;
+      z-index: 1004 !important;
+    }
+
+    /* 5) 页面内容增加顶部内边距，避免被 sticky 白条遮挡 */
+    main.mb-page {
+      padding-top: 99px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ================= 原始 SVG 图标定义 ================= -->
+  <svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+    <defs>
+      <symbol id="mb-svg-vd3ezk" viewBox="0 0 32 32">
+        <g>
+          <path
+            d="M17.925 16.039l8.171 8.171c0.521 0.521 0.521 1.365 0 1.886s-1.365 0.521-1.886 0l-8.171-8.171-8.171 8.171c-0.521 0.521-1.365 0.521-1.886 0s-0.521-1.365 0-1.886l8.171-8.171-8.171-8.171c-0.521-0.521-0.521-1.365 0-1.886s1.365-0.521 1.886 0l8.171 8.171 8.171-8.171c0.521-0.521 1.365-0.521 1.886 0s0.521 1.365 0 1.886l-8.171 8.171z">
+          </path>
+        </g>
+      </symbol>
+      <symbol id="mb-svg-17uhwdq" viewBox="64 64 896 896">
+        <g>
+          <path
+            d="M908.1 353.1l-253.9-36.9L540.7 86.1c-3.1-6.3-8.2-11.4-14.5-14.5-15.8-7.8-35-1.3-42.9 14.5L369.8 316.2l-253.9 36.9c-7 1-13.4 4.3-18.3 9.3a32.05 32.05 0 0 0 .6 45.3l183.7 179.1-43.4 252.9a31.95 31.95 0 0 0 46.4 33.7L512 754l227.1 119.4c6.2 3.3 13.4 4.4 20.3 3.2 17.4-3 29.1-19.5 26.1-36.9l-43.4-252.9 183.7-179.1c5-4.9 8.3-11.3 9.3-18.3 2.7-17.5-9.5-33.7-27-36.3zM664.8 561.6l36.1 210.3L512 672.7 323.1 772l36.1-210.3-152.8-149L417.6 382 512 190.7 606.4 382l211.2 30.7-152.8 148.9z">
+          </path>
+        </g>
+      </symbol>
+      <symbol id="mb-svg-e43ucv" viewBox="0 0 32 32">
+        <g>
+          <path
+            d="M16 24.347l-9.404 5.264 2.1-10.571-7.913-7.317 10.703-1.269 4.515-9.787 4.515 9.787 10.703 1.269-7.913 7.317 2.1 10.571z">
+          </path>
+        </g>
+      </symbol>
+      <symbol id="mb-svg-1u4kgca" viewBox="64 64 896 896">
+        <g>
+          <path
+            d="M924.8 625.7l-65.5-56c3.1-19 4.7-38.4 4.7-57.8s-1.6-38.8-4.7-57.8l65.5-56a32.03 32.03 0 0 0 9.3-35.2l-.9-2.6a443.74 443.74 0 0 0-79.7-137.9l-1.8-2.1a32.12 32.12 0 0 0-35.1-9.5l-81.3 28.9c-30-24.6-63.5-44-99.7-57.6l-15.7-85a32.05 32.05 0 0 0-25.8-25.7l-2.7-.5c-52.1-9.4-106.9-9.4-159 0l-2.7.5a32.05 32.05 0 0 0-25.8 25.7l-15.8 85.4a351.86 351.86 0 0 0-99 57.4l-81.9-29.1a32 32 0 0 0-35.1 9.5l-1.8 2.1a446.02 446.02 0 0 0-79.7 137.9l-.9 2.6c-4.5 12.5-.8 26.5 9.3 35.2l66.3 56.6c-3.1 18.8-4.6 38-4.6 57.1 0 19.2 1.5 38.4 4.6 57.1L99 625.5a32.03 32.03 0 0 0-9.3 35.2l.9 2.6c18.1 50.4 44.9 96.9 79.7 137.9l1.8 2.1a32.12 32.12 0 0 0 35.1 9.5l81.9-29.1c29.8 24.5 63.1 43.9 99 57.4l15.8 85.4a32.05 32.05 0 0 0 25.8 25.7l2.7.5a449.4 449.4 0 0 0 159 0l2.7-.5a32.05 32.05 0 0 0 25.8-25.7l15.7-85a350 350 0 0 0 99.7-57.6l81.3 28.9a32 32 0 0 0 35.1-9.5l1.8-2.1c34.8-41.1 61.6-87.5 79.7-137.9l.9-2.6c4.5-12.3.8-26.3-9.3-35zM788.3 465.9c2.5 15.1 3.8 30.6 3.8 46.1s-1.3 31-3.8 46.1l-6.6 40.1 74.7 63.9a370.03 370.03 0 0 1-42.6 73.6L721 702.8l-31.4 25.8c-23.9 19.6-50.5 35-79.3 45.8l-38.1 14.3-17.9 97a377.5 377.5 0 0 1-85 0l-17.9-97.2-37.8-14.5c-28.5-10.8-55-26.2-78.7-45.7l-31.4-25.9-93.4 33.2c-17-22.9-31.2-47.6-42.6-73.6l75.5-64.5-6.5-40c-2.4-14.9-3.7-30.3-3.7-45.5 0-15.3 1.2-30.6 3.7-45.5l6.5-40-75.5-64.5c11.3-26.1 25.6-50.7 42.6-73.6l93.4 33.2 31.4-25.9c23.7-19.5 50.2-34.9 78.7-45.7l37.9-14.3 17.9-97.2c28.1-3.2 56.8-3.2 85 0l17.9 97 38.1 14.3c28.7 10.8 55.4 26.2 79.3 45.8l31.4 25.8 92.8-32.9c17 22.9 31.2 47.6 42.6 73.6L781.8 426l6.5 39.9zM512 326c-97.2 0-176 78.8-176 176s78.8 176 176 176 176-78.8 176-176-78.8-176-176-176zm79.2 255.2A111.6 111.6 0 0 1 512 614c-29.9 0-58-11.7-79.2-32.8A111.6 111.6 0 0 1 400 502c0-29.9 11.7-58 32.8-79.2C454 401.6 482.1 390 512 390c29.9 0 58 11.6 79.2 32.8A111.6 111.6 0 0 1 624 502c0 29.9-11.7 58-32.8 79.2z">
+          </path>
+        </g>
+      </symbol>
+      <symbol id="mb-svg-1lfd6zx" viewBox="0 0 48 48">
+        <g>
+          <rect width="48" height="48" fill="white" fill-opacity="0.01"></rect>
+          <rect width="48" height="48" fill="white" fill-opacity="0.01"></rect>
+          <path
+            d="M9 15V9.56389C9 8.67237 9.08702 8.34908 9.25044 8.02315C9.41385 7.69723 9.65365 7.44144 9.95921 7.26713C10.2648 7.09283 10.5678 7 11.4036 7H36.5964C37.4322 7 37.7352 7.09283 38.0408 7.26713C38.3463 7.44144 38.5862 7.69723 38.7496 8.02315C38.913 8.34908 39 8.67237 39 9.56389V15"
+            stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+          <path d="M5 15H43V41H5V15Z" stroke="#333" stroke-width="4" stroke-linejoin="round"></path>
+          <path fill-rule="evenodd" clip-rule="evenodd"
+            d="M13 26C14.6569 26 16 24.6569 16 23C16 21.3431 14.6569 20 13 20C11.3431 20 10 21.3431 10 23C10 24.6569 11.3431 26 13 26Z"
+            fill="#333"></path>
+          <path d="M5.56885 40.39L14.9999 30L19.9999 34L25.9999 27L42.3937 40.39" stroke="#333" stroke-width="4"
+            stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+      </symbol>
+      <symbol id="mb-svg-1ojlvzn" viewBox="0 0 48 48">
+        <g>
+          <rect width="48" height="48" fill="white" fill-opacity="0.01"></rect>
+          <path
+            d="M44.0001 11C44.0001 11 44 36.0623 44 38C44 41.3137 35.0457 44 24 44C12.9543 44 4.00003 41.3137 4.00003 38C4.00003 36.1423 4 11 4 11"
+            stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+          <path d="M44 29C44 32.3137 35.0457 35 24 35C12.9543 35 4 32.3137 4 29" stroke="#333" stroke-width="4"
+            stroke-linecap="round" stroke-linejoin="round"></path>
+          <path d="M44 20C44 23.3137 35.0457 26 24 26C12.9543 26 4 23.3137 4 20" stroke="#333" stroke-width="4"
+            stroke-linecap="round" stroke-linejoin="round"></path>
+          <ellipse cx="24" cy="10" rx="20" ry="6" fill="none" stroke="#333" stroke-width="4" stroke-linecap="round"
+            stroke-linejoin="round"></ellipse>
+        </g>
+      </symbol>
+      <symbol id="mb-svg-cs6psi" viewBox="64 64 896 896">
+        <g>
+          <path
+            d="M888 792H200V168c0-4.4-3.6-8-8-8h-56c-4.4 0-8 3.6-8 8v688c0 4.4 3.6 8 8 8h752c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm-616-64h536c4.4 0 8-3.6 8-8V284c0-7.2-8.7-10.7-13.7-5.7L592 488.6l-125.4-124a8.03 8.03 0 0 0-11.3 0l-189 189.6a7.87 7.87 0 0 0-2.3 5.6V720c0 4.4 3.6 8 8 8z">
+          </path>
+        </g>
+      </symbol>
+      <symbol id="mb-svg-1kjw3ip" viewBox="0 0 32 32">
+        <g>
+          <path
+            d="M15.811 23.47c-0.252-0.06-0.47-0.185-0.641-0.356l-10.685-10.685c-0.521-0.521-0.521-1.365 0-1.886s1.365-0.521 1.886 0l9.746 9.746 9.745-9.745c0.521-0.521 1.365-0.521 1.886 0s0.521 1.365 0 1.886l-10.685 10.685c-0.339 0.339-0.816 0.458-1.251 0.355z">
+          </path>
+        </g>
+      </symbol>
+      <symbol id="mb-svg-5ccqx" viewBox="0 0 32 32">
+        <g>
+          <path
+            d="M22.757 16.257c-0.06 0.252-0.185 0.47-0.356 0.641l-10.685 10.685c-0.521 0.521-1.365 0.521-1.886 0s-0.521-1.365 0-1.886l9.746-9.746-9.745-9.745c-0.521-0.521-0.521-1.365 0-1.886s1.365-0.521 1.886 0l10.685 10.685c0.339 0.339 0.458 0.816 0.355 1.251z">
+          </path>
+        </g>
+      </symbol>
+    </defs>
+  </svg>
+
+  <!-- ================= 主页面（保留原布局） ================= -->
+  <div class="mb-document">
+    <main id="mb-6rto2n" class="mb-page" data-mb-cid="rbpVVWxfbVzPGhk63" data-mb-type="rResBunch"
+      style="width:1920px;height:1753px;--mb-sticky-header-height:100px;--mb-sticky-footer-height:0px;--mb-overview-row-height:1753px;overflow-x:hidden;overflow-y:overlay;margin:0 auto">
+
+      <div data-mb-cid="rcVVWxfbWM3Csg6e" data-mb-type="rResCanvas" id="mb-q6iqi8"
+        class="mb-tree-node mb-rResCanvas mb-route-canvas mb-s-1mkm6w5"
+        style="position:absolute;left:0;top:0;width:1920px;height:1753px;z-index:5;margin:0"
+        data-mb-route="#%E9%A1%B5%E9%9D%A2%201">
+        <div class="mb-canvas-viewport" style="background:rgba(255,255,255,1)">
+          <div class="mb-container-content mb-isClipContent" style="background:rgba(255,255,255,1)">
+
+            <!-- ============ 顶部白条背景 ============ -->
+            <div data-mb-cid="VVXTyAkxWDBwsO" data-mb-type="wRect" id="mb-wh2f8e"
+              class="mb-tree-node mb-wRect mb-s-1mkm6w5"
+              style="position:absolute;left:-959.5px;top:-118px;width:1919px;height:99px;z-index:1"></div>
+
+            <!-- 顶部装饰图片 -->
+            <div data-mb-cid="VVXCL1z8iwdJga" data-mb-type="wImage" id="mb-17em5zr"
+              class="mb-tree-node mb-wImage mb-s-174fcat"
+              style="position:absolute;left:-959.5px;top:-118px;width:133px;height:99px;z-index:2">
+              <div class="mb-image-wrapper"
+                style="width:100%;height:100%;border-radius:inherit;overflow:hidden;border-color:transparent;border-style:none;border-width:0;box-shadow:none">
+                <div class="mb-image-container" style="">
+                  <img class="mb-img" src="/res-img/org/2506/ai5.jpg" alt="图片 1"
+                    style="width:133px;height:99.75px;transform:translate(0px,-0.37px)" draggable="false">
+                </div>
+              </div>
+            </div>
+
+            <!-- ============ 顶部导航菜单（搜索框、下拉菜单、头像） ============ -->
+            <div data-mb-cid="wwVVXUEAhXPAoKwM" data-mb-type="wWrap" id="mb-1d1zpuz" class="mb-tree-node mb-wWrap"
+              style="position:absolute;left:960px;top:118.5px;width:0px;height:0px;z-index:6">
+              <div data-mb-cid="wwVVXTHHricXfawV" data-mb-type="wWrap" id="mb-rt0bwd" class="mb-tree-node mb-wWrap"
+                style="position:absolute;left:-412px;top:27.5px;width:0px;height:0px;z-index:3">
+                <div data-mb-cid="wwVVXTCERsHyV2wp" data-mb-type="wWrap" id="mb-18irq2w" class="mb-tree-node mb-wWrap"
+                  style="position:absolute;left:283px;top:-73px;width:0px;height:0px;z-index:2">
+                  <div data-mb-cid="VVXHYBZpLszhtz" data-mb-type="wIcon" id="mb-up8zbd"
+                    class="mb-tree-node mb-wIcon mb-s-1340zf0"
+                    style="position:absolute;left:-114px;top:-12px;width:30px;height:30px;z-index:2">
+                    <span class="mb-icon mb-svg-icon-wrap"
+                      style="position:relative;display:block;width:100%;height:100%;min-width:30px;min-height:30px;--mb-icon-fill:rgba(16,16,16,1)">
+                      <svg class="mb-svg-icon-path-icon mb-fill" viewBox="0 0 32 32" width="30" height="30"
+                        aria-hidden="true">
+                        <g>
+                          <path
+                            d="M30.428 28.814l-7.377-7.377c1.614-2.073 2.766-4.611 2.766-7.606 0-6.681-5.301-11.983-11.986-11.983-6.681 0-11.983 5.301-11.983 11.987 0 6.685 5.301 11.987 11.987 11.987 2.997 0 5.533-1.155 7.608-2.769l7.374 7.374 1.614-1.614zM4.146 13.83c0-5.301 4.38-9.681 9.683-9.681 5.301 0 9.679 4.38 9.679 9.683 0 2.303-0.924 4.608-2.307 6.222l-1.155 1.152c-1.614 1.383-3.919 2.305-6.223 2.305-5.301 0-9.681-4.383-9.681-9.683z">
+                          </path>
+                        </g>
+                      </svg>
+                    </span>
+                  </div>
+                  <div data-mb-cid="VVXHLkYneKUxcz" data-mb-type="wBasket" id="mb-1kr124r"
+                    class="mb-tree-node mb-wBasket"
+                    style="position:absolute;left:-83.5px;top:-17px;width:199px;height:36px;z-index:1;overflow:hidden">
+                    <div data-mb-cid="rcUkHiyGNr2XDkVy" data-mb-type="rResCanvas" id="mb-1x63lv7"
+                      class="mb-tree-node mb-rResCanvas"
+                      style="position:absolute;left:0;top:0;width:200px;height:36px;z-index:5;border-radius:0px"
+                      data-mb-basket-canvas="true">
+                      <div class="mb-canvas-viewport" style="background:transparent">
+                        <div class="mb-container-content mb-isClipContent" style="background:transparent">
+                          <div data-mb-cid="TtTV0ibAVVXHLkYOyzQ9L4" data-mb-type="wMTextInput" id="mb-otctsd"
+                            class="mb-tree-node mb-wMTextInput"
+                            style="position:absolute;left:0px;top:0px;width:200px;height:36px;z-index:109;background:rgba(255,255,255,1);border-color:rgba(220,223,230,1);border-style:solid;border-width:1px;border-radius:4px;overflow:hidden;color:rgba(193,194,197,1);font-family:PingFangSC;font-size:14px;line-height:20px;align-items:center;justify-content:left">
+                            <input class="mb-form-control" type="text" value="" placeholder="请输入内容" aria-label="单行输入"
+                              style="padding-top:0px;padding-right:0px;padding-bottom:0px;padding-left:8px">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 顶部导航栏主体 -->
+              <div data-mb-cid="VVXE5mxiE9XuOi" data-mb-type="wBasket" id="mb-ynq6m6" class="mb-tree-node mb-wBasket"
+                style="position:absolute;left:-399px;top:-90px;width:800px;height:180px;z-index:1;overflow:hidden">
+                <div data-mb-cid="rcUkIxy3VVXETz5WVY30aO" data-mb-type="rResCanvas" id="mb-y5ujnw"
+                  class="mb-tree-node mb-rResCanvas"
+                  style="position:absolute;left:0;top:0;width:800px;height:182px;z-index:5;border-radius:0px"
+                  data-mb-basket-canvas="true">
+                  <div class="mb-canvas-viewport" style="background:transparent">
+                    <div class="mb-container-content mb-isClipContent" style="background:transparent">
+
+                      <!-- 一级导航：首页 / 订单管理 / 消息管理 -->
+                      <div data-mb-cid="wbU1mxDZVVXETz5AqhmzUV" data-mb-type="wBasket" id="mb-p7591z"
+                        class="mb-tree-node mb-wBasket"
+                        style="position:absolute;left:423px;top:0px;width:98px;height:40px;z-index:113;overflow:hidden">
+                        <div data-mb-cid="rclrk9xpVVXETz59xlpjlq" data-mb-type="rResCanvas" id="mb-1a41kcm"
+                          class="mb-tree-node mb-rResCanvas mb-s-1a1q4kg"
+                          style="position:absolute;left:0;top:0;width:98px;height:40px;z-index:1"
+                          data-mb-basket-canvas="true">
+                          <div class="mb-canvas-viewport" style="background:rgba(255,255,255,0)">
+                            <div class="mb-container-content mb-isClipContent" style="background:rgba(255,255,255,0)">
+                              <div id="mb-djia0v" class="mb-tree-node mb-wRect mb-rich-text mb-h-center"
+                                style="position:absolute;left:0px;top:0px;width:98px;height:40px;z-index:523;background:rgba(255,255,255,1);border-radius:4px;color:rgba(24,144,255,1);font-family:PingFangSC;font-size:14px;line-height:20px;text-align:center;overflow:hidden;align-items:center;justify-content:center"
+                                data-mb-cid="TtTTvIjJVVXETz5RXg02xn" data-mb-type="wRect">
+                                <p class="mb-rs-da01c7"><span class="mb-rs-11ex8ud">消息管理</span></p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div data-mb-cid="wbU1mxDZVVXETz5tak52hl" data-mb-type="wBasket" id="mb-dz28te"
+                        class="mb-tree-node mb-wBasket"
+                        style="position:absolute;left:0px;top:0px;width:98px;height:40px;z-index:110;overflow:hidden">
+                        <div data-mb-cid="rclrk9xpVVXETz5g1KNJBU" data-mb-type="rResCanvas" id="mb-5eccp8"
+                          class="mb-tree-node mb-rResCanvas mb-s-1a1q4kg"
+                          style="position:absolute;left:0;top:0;width:98px;height:40px;z-index:1"
+                          data-mb-basket-canvas="true">
+                          <div class="mb-canvas-viewport" style="background:rgba(255,255,255,0)">
+                            <div class="mb-container-content mb-isClipContent" style="background:rgba(255,255,255,0)">
+                              <div id="mb-101j0fi" class="mb-tree-node mb-wRect mb-rich-text mb-h-center mb-s-1sv5s3j"
+                                style="position:absolute;left:0px;top:0px;width:98px;height:40px;z-index:523;overflow:hidden"
+                                data-mb-cid="TtTTvIjJVVXETz5XPzqNC0" data-mb-type="wRect">
+                                <p class="mb-rs-da01c7"><span class="mb-rs-edyxrp">首页</span></p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- 行业资料 -->
+                      <div id="mb-1pywlcu" class="mb-tree-node mb-wRichText mb-rich-text mb-h-left"
+                        style="position:absolute;left:320px;top:10px;width:56px;height:20px;z-index:112;color:rgba(187,187,187,1);font-family:PingFangSC;font-size:14px;line-height:20px;overflow:visible;white-space:pre"
+                        data-mb-cid="TtTTv1aKVVXETz5UqdNz3Y" data-mb-type="wRichText">
+                        <p class="mb-rs-da01c7"><span style="color:rgba(187,187,187,1)">行业资料</span></p>
+                      </div>
+
+                      <!-- 底部蓝线 -->
+                      <div data-mb-cid="TtTTvIjJVVXETz5dKaYioJ" data-mb-type="wRect" id="mb-kqpc7v"
+                        class="mb-tree-node mb-wRect"
+                        style="position:absolute;left:0px;top:40px;width:98px;height:2px;z-index:111;background:rgba(24,144,255,1);border-color:rgba(24,144,255,1);border-style:solid;border-width:1px;border-radius:0px">
+                      </div>
+
+                      <!-- 订单管理 -->
+                      <div data-mb-cid="wbU1mxDZVVXETz5AqhmzUV" data-mb-type="wBasket" id="mb-p7591z-2"
+                        class="mb-tree-node mb-wBasket"
+                        style="position:absolute;left:423px;top:0px;width:98px;height:40px;z-index:113;overflow:hidden">
+                        <div data-mb-cid="rclrk9xpVVXETz59xlpjlq" data-mb-type="rResCanvas" id="mb-1a41kcm-2"
+                          class="mb-tree-node mb-rResCanvas mb-s-1a1q4kg"
+                          style="position:absolute;left:0;top:0;width:98px;height:40px;z-index:1"
+                          data-mb-basket-canvas="true">
+                          <div class="mb-canvas-viewport" style="background:rgba(255,255,255,0)">
+                            <div class="mb-container-content mb-isClipContent" style="background:rgba(255,255,255,0)">
+                              <div id="mb-djia0v-2" class="mb-tree-node mb-wRect mb-rich-text mb-h-center"
+                                style="position:absolute;left:0px;top:0px;width:98px;height:40px;z-index:523;background:rgba(255,255,255,1);border-radius:4px;color:rgba(24,144,255,1);font-family:PingFangSC;font-size:14px;line-height:20px;text-align:center;overflow:hidden;align-items:center;justify-content:center">
+                                <p class="mb-rs-da01c7"><span class="mb-rs-11ex8ud">订单管理</span></p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- 分割线 -->
+                      <div data-mb-cid="TtTUK6pcVVXETz557NTPQK" data-mb-type="wLine" id="mb-1eklyi4"
+                        class="mb-tree-node mb-wLine"
+                        style="position:absolute;left:0px;top:41px;width:800px;height:1px;z-index:109;pointer-events:none">
+                        <div class="mb-geometry-container">
+                          <svg class="mb-vector" viewBox="0 0 800 1" preserveAspectRatio="none" style="filter:none"
+                            aria-hidden="true">
+                            <g>
+                              <defs></defs>
+                              <path d="M 0 0.5 L 800 0.5" fill="none" stroke="rgba(193,194,197,1)" stroke-width="1"
+                                stroke-dasharray=""></path>
+                            </g>
+                          </svg>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 下拉菜单 -->
+              <div data-mb-cid="VVX7Wz9CzC0xhE" data-mb-type="wBasket" id="mb-sqehlt" class="mb-tree-node mb-wBasket"
+                style="position:absolute;width:154px;height:185px;overflow:hidden;left:calc(1766px + var(--mb-fixed-scroll-x,0px));top:calc(72px + var(--mb-fixed-scroll-y,0px));z-index:22;clip-path:inset(0 0 157px 0)"
+                data-mb-fixed-region="header">
+                <div data-mb-cid="rcUTzdlcUk2y0qcWS94YnN" data-mb-type="rResCanvas" id="mb-1oj91t3"
+                  class="mb-tree-node mb-rResCanvas"
+                  style="position:absolute;left:0;top:0;width:156px;height:185px;z-index:6;border-radius:0px"
+                  data-mb-basket-canvas="true">
+                  <div class="mb-canvas-viewport" style="background:transparent">
+                    <div class="mb-container-content mb-isClipContent" style="background:transparent">
+                      <div data-mb-cid="wbU1n1azVVX7Wz7d7k8kAI" data-mb-type="wBasket" id="mb-t031km"
+                        class="mb-tree-node mb-wBasket"
+                        style="position:absolute;left:0px;top:0px;width:98px;height:36px;z-index:27;overflow:hidden">
+                        <div data-mb-cid="rcU1n1azVVX7Wz7T59KArX" data-mb-type="rResCanvas" id="mb-7zg5zl"
+                          class="mb-tree-node mb-rResCanvas"
+                          style="position:absolute;left:0;top:0;width:98px;height:36px;z-index:5;border-radius:0px"
+                          data-mb-basket-canvas="true">
+                          <div class="mb-canvas-viewport" style="background:transparent">
+                            <div class="mb-container-content mb-isClipContent" style="background:transparent">
+                              <div id="mb-nwcaa2" class="mb-tree-node mb-wRect mb-rich-text mb-h-center mb-s-1so1iy4"
+                                style="position:absolute;left:0px;top:0px;width:98px;height:36px;z-index:528;overflow:hidden">
+                                下拉菜单</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div data-mb-cid="wwUTze0VVVX7Wz74iYo90v" data-mb-type="wWrap" id="mb-18oeody"
+                        class="mb-tree-node mb-wWrap"
+                        style="position:absolute;left:114px;top:18px;width:0px;height:0px;z-index:21">
+                        <div data-mb-cid="UTxq1iYEVVX7Wz7oC0kfiD" data-mb-type="wIcon" id="mb-1xnfja2"
+                          class="mb-tree-node mb-wIcon mb-s-1340zf0"
+                          style="position:absolute;left:-6px;top:-7px;width:14px;height:14px;transform:rotate(270deg);z-index:2">
+                          <span class="mb-icon mb-svg-icon-wrap"
+                            style="position:relative;display:block;width:100%;height:100%;min-width:14px;min-height:14px;--mb-icon-fill:rgba(255,255,255,1)">
+                            <svg class="mb-svg-icon-path-icon mb-fill" viewBox="0 0 32 32" width="14" height="14"
+                              aria-hidden="true">
+                              <use href="#mb-svg-5ccqx"></use>
+                            </svg>
+                          </span>
+                        </div>
+                        <div data-mb-cid="TtTTvIjJVVX7Wz7m4VZEL3" data-mb-type="wRect" id="mb-1ocgdfi"
+                          class="mb-tree-node mb-wRect mb-s-139k8gv"
+                          style="position:absolute;left:-14px;top:-18px;width:28px;height:36px;z-index:1"></div>
+                      </div>
+                      <div data-mb-cid="wwUTzf3fVVX7Wz7WaxzWB0" data-mb-type="wWrap" id="mb-abdhdt"
+                        class="mb-tree-node mb-wWrap"
+                        style="position:absolute;left:77px;top:111px;width:0px;height:0px;z-index:28">
+                        <div data-mb-cid="wbUTxtomVVX7Wz7KYZuxal" data-mb-type="wBasket" id="mb-1jwuf28"
+                          class="mb-tree-node mb-wBasket"
+                          style="position:absolute;left:-50px;top:32px;width:99.88px;height:30px;z-index:6;overflow:hidden">
+                          <div data-mb-cid="rcUTxtomVVX7Wz7B3jNPs3" data-mb-type="rResCanvas" id="mb-trksuj"
+                            class="mb-tree-node mb-rResCanvas"
+                            style="position:absolute;left:0;top:0;width:99.88px;height:30px;z-index:5;border-radius:0px"
+                            data-mb-basket-canvas="true">
+                            <div class="mb-canvas-viewport" style="background:transparent">
+                              <div class="mb-container-content mb-isClipContent" style="background:transparent">
+                                <div id="mb-1ihoj8d" class="mb-tree-node mb-wRect mb-rich-text mb-h-center mb-s-1wmedkn"
+                                  style="position:absolute;left:0px;top:0px;width:99.88px;height:30px;z-index:4;cursor:pointer;overflow:hidden"
+                                  data-mb-cid="ik6rlt9uVVX7Wz7OUzRmsS" data-mb-type="wRect">
+                                  <p class="mb-rs-da01c7"><span class="mb-rs-1iargvh">链接四</span></p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div id="mb-99xl9" class="mb-tree-node mb-wRect mb-rich-text mb-h-center mb-s-gez80i"
+                          style="position:absolute;left:-50px;top:0px;width:99.88px;height:30px;z-index:5;cursor:pointer;overflow:hidden"
+                          data-mb-cid="ik6rlt9uVVX7Wz7V7vJ3gV" data-mb-type="wRect">
+                          <p class="mb-rs-da01c7"><span class="mb-rs-16gayjm">链接三</span></p>
+                        </div>
+                        <div data-mb-cid="wbUTxtomVVX7Wz7VVDGVGw" data-mb-type="wBasket" id="mb-qrvesp"
+                          class="mb-tree-node mb-wBasket"
+                          style="position:absolute;left:-50px;top:-32px;width:99.88px;height:30px;z-index:3;overflow:hidden">
+                          <div data-mb-cid="rcUTxtomVVX7Wz7kbX9WNZ" data-mb-type="rResCanvas" id="mb-18m8gej"
+                            class="mb-tree-node mb-rResCanvas"
+                            style="position:absolute;left:0;top:0;width:99.88px;height:30px;z-index:5;border-radius:0px"
+                            data-mb-basket-canvas="true">
+                            <div class="mb-canvas-viewport" style="background:transparent">
+                              <div class="mb-container-content mb-isClipContent" style="background:transparent">
+                                <div id="mb-1ut6zdf" class="mb-tree-node mb-wRect mb-rich-text mb-h-center mb-s-1wmedkn"
+                                  style="position:absolute;left:0px;top:0px;width:99.88px;height:30px;z-index:4;cursor:pointer;overflow:hidden">
+                                  <p class="mb-rs-da01c7"><span class="mb-rs-1iargvh">链接二</span></p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div data-mb-cid="wbUTxtomVVX7Wz7y6fYwcu" data-mb-type="wBasket" id="mb-oxtc5d"
+                          class="mb-tree-node mb-wBasket"
+                          style="position:absolute;left:-49.88px;top:-64px;width:99.88px;height:30px;z-index:2;overflow:hidden">
+                          <div data-mb-cid="rcUTxtomVVX7Wz7r57xQbn" data-mb-type="rResCanvas" id="mb-3ecnut"
+                            class="mb-tree-node mb-rResCanvas"
+                            style="position:absolute;left:0;top:0;width:99.88px;height:30px;z-index:5;border-radius:0px"
+                            data-mb-basket-canvas="true">
+                            <div class="mb-canvas-viewport" style="background:transparent">
+                              <div class="mb-container-content mb-isClipContent" style="background:transparent">
+                                <div id="mb-rednt6" class="mb-tree-node mb-wRect mb-rich-text mb-h-center mb-s-1wmedkn"
+                                  style="position:absolute;left:0px;top:0px;width:99.88px;height:30px;z-index:4;cursor:pointer;overflow:hidden">
+                                  <p class="mb-rs-da01c7"><span class="mb-rs-1iargvh">链接一</span></p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div data-mb-cid="ik6rlt9uVVX7Wz7ZYlJnT8" data-mb-type="wRect" id="mb-t0w95j"
+                          class="mb-tree-node mb-wRect mb-s-b3fo4j"
+                          style="position:absolute;left:-51px;top:-73px;width:102px;height:146px;z-index:1"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 头像 -->
+              <div data-mb-cid="wbVVX6x2TxrA2LO4" data-mb-type="wBasket" id="mb-fosafk" class="mb-tree-node mb-wBasket"
+                style="position:absolute;width:69px;height:70px;overflow:hidden;left:calc(1808.5px + var(--mb-fixed-scroll-x,0px));top:calc(2.5px + var(--mb-fixed-scroll-y,0px));z-index:21"
+                data-mb-fixed-region="header">
+                <div data-mb-cid="rcVVX6x2TDtD9pvp" data-mb-type="rResCanvas" id="mb-ae0rlx"
+                  class="mb-tree-node mb-rResCanvas"
+                  style="position:absolute;left:0;top:0;width:70px;height:70px;z-index:5;border-radius:0px"
+                  data-mb-basket-canvas="true">
+                  <div class="mb-canvas-viewport" style="background:transparent">
+                    <div class="mb-container-content mb-isClipContent" style="background:transparent">
+                      <div data-mb-cid="VVX5RgT5Uzy52c" data-mb-type="wBasket" id="mb-yj1vfw"
+                        class="mb-tree-node mb-wBasket"
+                        style="position:absolute;left:0px;top:0px;width:70px;height:70px;z-index:11;overflow:hidden">
+                        <div data-mb-cid="rcUkI70WQ89C4Bon" data-mb-type="rResCanvas" id="mb-1ycqzz9"
+                          class="mb-tree-node mb-rResCanvas"
+                          style="position:absolute;left:0;top:0;width:70px;height:70px;z-index:5;border-radius:0px"
+                          data-mb-basket-canvas="true">
+                          <div class="mb-canvas-viewport" style="background:transparent">
+                            <div class="mb-container-content mb-isClipContent" style="background:transparent">
+                              <div data-mb-cid="UT8zDXUjVVX5RgSFd00dx0" data-mb-type="wImage" id="mb-1egtr1o"
+                                class="mb-tree-node mb-wImage mb-s-174fcat"
+                                style="position:absolute;left:0px;top:0px;width:70px;height:70px;z-index:131">
+                                <div class="mb-image-wrapper"
+                                  style="width:100%;height:100%;border-radius:inherit;overflow:hidden">
+                                  <div class="mb-image-container" style="">
+                                    <img class="mb-img" src="/uploads7/images/14056/140567678/v2_smf2jb.png" alt="图片 2"
+                                      style="width:70px;height:70px;transform:translate(0px,0px)" draggable="false">
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ============ 左侧导航（fixed） ============ -->
+            <div data-mb-cid="wwVVX8wRwIpyv7e2" data-mb-type="wWrap" id="mb-1yya1y5" class="mb-tree-node mb-wWrap"
+              style="position:absolute;width:0px;height:0px;z-index:9;left:calc(101px + var(--mb-fixed-scroll-x,0px));top:calc(552px + var(--mb-fixed-scroll-y,0px))"
+              data-mb-fixed-region="header">
+              <div data-mb-cid="VVX8VkOaS5wkI5" data-mb-type="wBasket" id="mb-1qjq96a" class="mb-tree-node mb-wBasket"
+                style="position:absolute;left:-101px;top:-250px;width:202px;height:500px;z-index:1;overflow:hidden">
+                <div data-mb-cid="rcUTiFheVVX8pMd7ggM6QA" data-mb-type="rResCanvas" id="mb-wp38xy"
+                  class="mb-tree-node mb-rResCanvas"
+                  style="position:absolute;left:0;top:0;width:202px;height:500px;z-index:5;border-radius:0px"
+                  data-mb-basket-canvas="true">
+                  <div class="mb-canvas-viewport" style="background:transparent">
+                    <div class="mb-container-content mb-isClipContent" style="background:transparent">
+                      <!-- 收起按钮 -->
+                      <div data-mb-cid="wbU2QdsbVVX8pMdn4aRbJA" data-mb-type="wBasket" id="mb-1k1d1as"
+                        class="mb-tree-node mb-wBasket"
+                        style="position:absolute;left:70px;top:0px;width:70px;height:32px;z-index:13;cursor:pointer;overflow:hidden">
+                        <div data-mb-cid="rcU2QdsbVVX8pMdZ7TDYCj" data-mb-type="rResCanvas" id="mb-fnjs0l"
+                          class="mb-tree-node mb-rResCanvas"
+                          style="position:absolute;left:0;top:0;width:70px;height:32px;z-index:5;border-radius:0px"
+                          data-mb-basket-canvas="true">
+                          <div class="mb-canvas-viewport" style="background:transparent">
+                            <div class="mb-container-content mb-isClipContent" style="background:transparent">
+                              <button data-mb-cid="il8h4z8pVVX8pMdFCK8aL4" data-mb-type="wButton" id="mb-61g8iq"
+                                class="mb-tree-node mb-wButton mb-wrapper mb-button-wrapper mb-icon-left mb-s-1iwpfv2"
+                                style="position:absolute;left:0px;top:0px;width:70px;height:32px;z-index:357;cursor:pointer;overflow:hidden"
+                                type="button" aria-label="收起">
+                                <div class="mb-rich-text"
+                                  style="color:rgba(16,16,16,1);font-family:PingFangSC;font-size:14px;line-height:20px;text-align:center;align-items:center;justify-content:center;padding:0">
+                                  <p class="mb-rs-da01c7"><span style="font-size:14px;line-height:20px">收起</span></p>
+                                </div>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <!-- 展开按钮 -->
+                      <button data-mb-cid="il8h4z8pVVX8pMdFq7D4Pv" data-mb-type="wButton" id="mb-10fk6s9"
+                        class="mb-tree-node mb-wButton mb-wrapper mb-button-wrapper mb-icon-left mb-s-yewv2k"
+                        style="position:absolute;left:0px;top:0px;width:70px;height:32px;z-index:12;overflow:hidden"
+                        type="button" aria-label="展开">
+                        <div class="mb-rich-text"
+                          style="color:rgba(255,255,255,1);font-family:PingFangSC;font-size:14px;line-height:20px;text-align:center;align-items:center;justify-content:center;padding:0">
+                          <p class="mb-rs-da01c7"><span style="font-size:14px;line-height:20px">展开</span></p>
+                        </div>
+                      </button>
+
+                      <!-- 导航一 -->
+                      <div data-mb-cid="wbUThWYgVVX8pMdvbF1U4Y" data-mb-type="wBasket" id="mb-1pzm6uo"
+                        class="mb-tree-node mb-wBasket"
+                        style="position:absolute;left:2px;top:63px;width:196px;height:39px;z-index:2;cursor:pointer;overflow:hidden">
+                        <div data-mb-cid="rcUThWYgVVX8pMdfPCLAg0" data-mb-type="rResCanvas" id="mb-emfybi"
+                          class="mb-tree-node mb-rResCanvas"
+                          style="position:absolute;left:0;top:0;width:196px;height:39px;z-index:5;border-radius:0px"
+                          data-mb-basket-canvas="true">
+                          <div class="mb-canvas-viewport" style="background:transparent">
+                            <div class="mb-container-content mb-isClipContent" style="background:transparent">
+                              <div data-mb-cid="UTgby8PcVVX8pMdTt1B2PP" data-mb-type="wIcon" id="mb-1uxfy5l"
+                                class="mb-tree-node mb-wIcon mb-s-1340zf0"
+                                style="position:absolute;left:17px;top:9px;width:20px;height:20px;z-index:29">
+                                <span class="mb-icon mb-svg-icon-wrap"
+                                  style="position:relative;display:block;width:100%;height:100%;min-width:20px;min-height:20px;--mb-icon-fill:rgba(89,89,89,1)">
+                                  <svg class="mb-svg-icon-path-icon mb-fill" viewBox="64 64 896 896" width="20"
+                                    height="20" aria-hidden="true">
+                                    <use href="#mb-svg-cs6psi"></use>
+                                  </svg>
+                                </span>
+                              </div>
+                              <div id="mb-1lyn6e9" class="mb-tree-node mb-wRichText mb-rich-text mb-h-left mb-s-17zfjq0"
+                                style="position:absolute;left:44px;top:11px;width:43px;height:20px;z-index:26;overflow:visible">
+                                <p class="mb-rs-da01c7"><span class="mb-rs-19cty71">导航一</span></p>
+                              </div>
+                              <div data-mb-cid="TtTTvIjJVVX8pMd540a7m6" data-mb-type="wRect" id="mb-vdvc5j"
+                                class="mb-tree-node mb-wRect mb-s-1mkm6w5"
+                                style="position:absolute;left:0px;top:0px;width:196px;height:39px;z-index:22"></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- 导航二 -->
+                      <div data-mb-cid="wbUThWgxVVX8pMdCdYhRJm" data-mb-type="wBasket" id="mb-1mirdvl"
+                        class="mb-tree-node mb-wBasket"
+                        style="position:absolute;left:2px;top:114px;width:196px;height:39px;z-index:3;overflow:hidden">
+                        <div data-mb-cid="rcUThWgxVVX8pMdW5Hvp6D" data-mb-type="rResCanvas" id="mb-etyhqy"
+                          class="mb-tree-node mb-rResCanvas"
+                          style="position:absolute;left:0;top:0;width:196px;height:39px;z-index:5;border-radius:0px"
+                          data-mb-basket-canvas="true">
+                          <div class="mb-canvas-viewport" style="background:transparent">
+                            <div class="mb-container-content mb-isClipContent" style="background:transparent">
+                              <div id="mb-1ks5fia" class="mb-tree-node mb-wRichText mb-rich-text mb-h-left mb-s-17zfjq0"
+                                style="position:absolute;left:44px;top:10px;width:43px;height:20px;z-index:39;overflow:visible">
+                                <p class="mb-rs-da01c7"><span class="mb-rs-19cty71">导航二</span></p>
+                              </div>
+                              <div data-mb-cid="UTgc16A3VVX8pMdQevgbvZ" data-mb-type="wIcon" id="mb-jbpn6v"
+                                class="mb-tree-node mb-wIcon mb-s-1340zf0"
+                                style="position:absolute;left:17px;top:10px;width:20px;height:20px;z-index:30">
+                                <span class="mb-icon mb-svg-icon-wrap"
+                                  style="position:relative;display:block;width:100%;height:100%;min-width:20px;min-height:20px;--mb-icon-fill:rgba(89,89,89,1)">
+                                  <svg class="mb-svg-icon-path-icon mb-fill" viewBox="0 0 48 48" width="20" height="20"
+                                    aria-hidden="true">
+                                    <use href="#mb-svg-1ojlvzn"></use>
+                                  </svg>
+                                </span>
+                              </div>
+                              <div data-mb-cid="TtTTvIjJVVX8pMdDYMkLFs" data-mb-type="wRect" id="mb-1b8l85h"
+                                class="mb-tree-node mb-wRect mb-s-1mkm6w5"
+                                style="position:absolute;left:0px;top:0px;width:196px;height:39px;z-index:23"></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- 导航三 -->
+                      <div data-mb-cid="wbUThWpyVVX8pMd1oEWd8C" data-mb-type="wBasket" id="mb-1yyvmf5"
+                        class="mb-tree-node mb-wBasket"
+                        style="position:absolute;left:2px;top:165px;width:196px;height:39px;z-index:4;overflow:hidden">
+                        <div data-mb-cid="rcUThWpyVVX8pMd2mNnh2p" data-mb-type="rResCanvas" id="mb-8hyy2j"
+                          class="mb-tree-node mb-rResCanvas"
+                          style="position:absolute;left:0;top:0;width:196px;height:39px;z-index:5;border-radius:0px"
+                          data-mb-basket-canvas="true">
+                          <div class="mb-canvas-viewport" style="background:transparent">
+                            <div class="mb-container-content mb-isClipContent" style="background:transparent">
+                              <div id="mb-1ow3n1u" class="mb-tree-node mb-wRichText mb-rich-text mb-h-left mb-s-17zfjq0"
+                                style="position:absolute;left:44px;top:9px;width:43px;height:20px;z-index:40;overflow:visible">
+                                <p class="mb-rs-da01c7"><span class="mb-rs-19cty71">导航三</span></p>
+                              </div>
+                              <div data-mb-cid="UTgc2QRHVVX8pMdeuiObei" data-mb-type="wIcon" id="mb-1i70j54"
+                                class="mb-tree-node mb-wIcon mb-s-1340zf0"
+                                style="position:absolute;left:17px;top:9px;width:20px;height:20px;z-index:31">
+                                <span class="mb-icon mb-svg-icon-wrap"
+                                  style="position:relative;display:block;width:100%;height:100%;min-width:20px;min-height:20px;--mb-icon-fill:rgba(89,89,89,1)">
+                                  <svg class="mb-svg-icon-path-icon mb-fill" viewBox="0 0 48 48" width="20" height="20"
+                                    aria-hidden="true">
+                                    <use href="#mb-svg-1lfd6zx"></use>
+                                  </svg>
+                                </span>
+                              </div>
+                              <div data-mb-cid="TtTTvIjJVVX8pMdgtq68Nd" data-mb-type="wRect" id="mb-1016zgl"
+                                class="mb-tree-node mb-wRect mb-s-1mkm6w5"
+                                style="position:absolute;left:0px;top:0px;width:196px;height:39px;z-index:24"></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- 导航四 -->
+                      <div data-mb-cid="wbUThWrvVVX8pMd9W3wFLs" data-mb-type="wBasket" id="mb-ikac3q"
+                        class="mb-tree-node mb-wBasket"
+                        style="position:absolute;left:2px;top:215px;width:196px;height:39px;z-index:5;overflow:hidden">
+                        <div data-mb-cid="rcUThWrvVVX8pMdykHBIKd" data-mb-type="rResCanvas" id="mb-lrpq2z"
+                          class="mb-tree-node mb-rResCanvas"
+                          style="position:absolute;left:0;top:0;width:196px;height:39px;z-index:5;border-radius:0px"
+                          data-mb-basket-canvas="true">
+                          <div class="mb-canvas-viewport" style="background:transparent">
+                            <div class="mb-container-content mb-isClipContent" style="background:transparent">
+                              <div id="mb-795ss" class="mb-tree-node mb-wRichText mb-rich-text mb-h-left mb-s-17zfjq0"
+                                style="position:absolute;left:44px;top:9px;width:43px;height:20px;z-index:42;overflow:visible">
+                                <p class="mb-rs-da01c7"><span class="mb-rs-19cty71">导航四</span></p>
+                              </div>
+                              <div data-mb-cid="UTgcGuwNVVX8pMdUOPL4lk" data-mb-type="wIcon" id="mb-kll551"
+                                class="mb-tree-node mb-wIcon mb-s-1340zf0"
+                                style="position:absolute;left:17px;top:9px;width:20px;height:20px;z-index:32">
+                                <span class="mb-icon mb-svg-icon-wrap"
+                                  style="position:relative;display:block;width:100%;height:100%;min-width:20px;min-height:20px;--mb-icon-fill:rgba(89,89,89,1)">
+                                  <svg class="mb-svg-icon-path-icon mb-fill" viewBox="64 64 896 896" width="20"
+                                    height="20" aria-hidden="true">
+                                    <use href="#mb-svg-1u4kgca"></use>
+                                  </svg>
+                                </span>
+                              </div>
+                              <div data-mb-cid="TtTTvIjJVVX8pMdvuOlpgK" data-mb-type="wRect" id="mb-1pmpxoz"
+                                class="mb-tree-node mb-wRect mb-s-1mkm6w5"
+                                style="position:absolute;left:0px;top:0px;width:196px;height:39px;z-index:25"></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- 分组一 / 选项 -->
+                      <div id="mb-1b4y17x" class="mb-tree-node mb-wRichText mb-rich-text mb-h-left mb-s-lxoip"
+                        style="position:absolute;left:46px;top:115px;width:43px;height:20px;z-index:3;overflow:visible">
+                        <p class="mb-rs-da01c7"><span class="mb-rs-1qtw4ro">分组一</span></p>
+                      </div>
+                      <div id="mb-1cma3ms" class="mb-tree-node mb-wRichText mb-rich-text mb-h-left mb-s-17zfjq0"
+                        style="position:absolute;left:46px;top:151px;width:34px;height:20px;z-index:4;overflow:visible">
+                        <p class="mb-rs-da01c7"><span class="mb-rs-19cty71">选项1</span></p>
+                      </div>
+                      <div id="mb-lvridh" class="mb-tree-node mb-wRichText mb-rich-text mb-h-left mb-s-17zfjq0"
+                        style="position:absolute;left:46px;top:188px;width:37px;height:20px;z-index:5;overflow:visible">
+                        <p class="mb-rs-da01c7"><span class="mb-rs-19cty71">选项2</span></p>
+                      </div>
+                      <div id="mb-1ditiax" class="mb-tree-node mb-wRichText mb-rich-text mb-h-left mb-s-lxoip"
+                        style="position:absolute;left:46px;top:226px;width:43px;height:20px;z-index:6;overflow:visible">
+                        <p class="mb-rs-da01c7"><span class="mb-rs-1qtw4ro">分组二</span></p>
+                      </div>
+                      <div id="mb-wuahxh" class="mb-tree-node mb-wRichText mb-rich-text mb-h-left mb-s-17zfjq0"
+                        style="position:absolute;left:46px;top:266px;width:37px;height:20px;z-index:7;overflow:visible">
+                        <p class="mb-rs-da01c7"><span class="mb-rs-19cty71">选项3</span></p>
+                      </div>
+                      <div id="mb-5pqhj3" class="mb-tree-node mb-wRichText mb-rich-text mb-h-left mb-s-17zfjq0"
+                        style="position:absolute;left:46px;top:306px;width:37px;height:20px;z-index:8;overflow:visible">
+                        <p class="mb-rs-da01c7"><span class="mb-rs-19cty71">选项4</span></p>
+                      </div>
+
+                      <!-- 侧栏背景 -->
+                      <div data-mb-cid="TtTTvIjJVVX8pMdfWIGTg8" data-mb-type="wRect" id="mb-1fkehyx"
+                        class="mb-tree-node mb-wRect mb-s-pzdiow"
+                        style="position:absolute;left:1px;top:50px;width:198px;height:440px;z-index:1"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ============ 右下角 AI 按钮（fixed） ============ -->
+            <div data-mb-cid="wwVVXIutm6Z8hQfk" data-mb-type="wWrap" id="mb-c4c69c" class="mb-tree-node mb-wWrap"
+              style="position:absolute;width:0px;height:0px;z-index:19;cursor:pointer;left:calc(1839px + var(--mb-fixed-scroll-x,0px));top:calc(994px + var(--mb-fixed-scroll-y,0px))"
+              data-mb-fixed-region="header">
+              <div id="mb-1bec5ko" class="mb-tree-node mb-wRichText mb-rich-text mb-h-left"
+                style="position:absolute;left:-13px;top:14px;width:27px;height:20px;z-index:2;color:#101010;font-family:PingFangSC;font-size:14px;line-height:20px;overflow:visible;white-space:pre"
+                data-mb-cid="VVXIreoGHypWU2" data-mb-type="wRichText">
+                <p class="mb-rs-da01c7"><span style="font-size:14px;line-height:20px">问AI</span></p>
+              </div>
+              <button data-mb-cid="TtTULQotVVXIOjlWd4bOqt" data-mb-type="wButton" id="mb-xrpsd3"
+                class="mb-tree-node mb-wButton mb-wrapper mb-button-wrapper mb-icon-left"
+                style="position:absolute;left:-24px;top:-34px;width:48px;height:48px;z-index:1;background:rgba(189,49,36,1);border-radius:24px;color:rgba(255,255,255,1);font-family:PingFangSC;font-size:28px;line-height:39px;text-align:center;overflow:hidden;align-items:center;justify-content:center;padding:4px 8px"
+                type="button" aria-label="AI">
+                <div class="mb-rich-text"
+                  style="color:rgba(255,255,255,1);font-family:PingFangSC;font-size:28px;line-height:39px;text-align:center;align-items:center;justify-content:center;padding:0">
+                  <p style="line-height:39px"><span
+                      style="color:rgba(255,255,255,1);font-size:28px;line-height:39px">AI</span></p>
+                </div>
+              </button>
+            </div>
+
+            <!-- ============ 左侧下拉菜单弹层（评分组件内的 hover 菜单，保留原样） ============ -->
+            <!-- 此处省略原文件中位于对话框内部的下拉菜单弹层，因其为弹窗内部元素，不影响主布局 -->
+
+            <!-- ============ 主内容区（原布局保留） ============ -->
+
+            <!-- 页面主体：Hero + 标签 + 卡片 -->
+            <div data-mb-cid="ik889fx8VVX21dRbBmvUBC" data-mb-type="wRect" id="mb-1s04cpa" class="mb-tree-node mb-wRect"
+              style="position:absolute;left:0px;top:100px;width:1920px;height:541px;z-index:2;background:rgba(64,149,229,1);border-radius:0px">
+            </div>
+
+            <div data-mb-cid="wwVVXMtAnqbdmwwU" data-mb-type="wWrap" id="mb-wnk6us" class="mb-tree-node mb-wWrap"
+              style="position:absolute;left:924px;top:366px;width:0px;height:0px;z-index:3">
+              <div data-mb-cid="wwVVXMoy1DizF7Li" data-mb-type="wWrap" id="mb-px7zma" class="mb-tree-node mb-wWrap"
+                style="position:absolute;left:48px;top:-164.5px;width:0px;height:0px;z-index:2">
+                <div data-mb-cid="wwVVXMm4wZKNUtRx" data-mb-type="wWrap" id="mb-1qqow6i" class="mb-tree-node mb-wWrap"
+                  style="position:absolute;left:-9.5px;top:66px;width:0px;height:0px;z-index:2">
+                  <div id="mb-pipx7g" class="mb-tree-node mb-wRect mb-rich-text mb-h-center"
+                    style="position:absolute;left:-154.5px;top:-16.5px;width:144px;height:33px;z-index:2;background:rgba(255,255,255,1);border-radius:2px;color:rgba(46,83,228,1);font-family:PingFangSC;font-size:14px;line-height:20px;text-align:center;overflow:hidden;align-items:center;justify-content:center">
+                    免费使用</div>
+                  <div id="mb-txzl1l" class="mb-tree-node mb-wRect mb-rich-text mb-h-center"
+                    style="position:absolute;left:10.5px;top:-16.5px;width:144px;height:33px;z-index:1;background:rgba(255,0,0,0);border-color:rgba(255,255,255,1);border-style:solid;border-width:1px;border-radius:2px;color:rgba(255,255,255,1);font-family:PingFangSC;font-size:14px;line-height:20px;text-align:center;overflow:hidden;align-items:center;justify-content:center">
+                    预约演示</div>
+                </div>
+                <div data-mb-cid="wwVVXMhWUwJbWkej" data-mb-type="wWrap" id="mb-fwab94" class="mb-tree-node mb-wWrap"
+                  style="position:absolute;left:0px;top:-24px;width:0px;height:0px;z-index:1">
+                  <div data-mb-cid="wwVVXMIEshWy5ODS" data-mb-type="wWrap" id="mb-16ctodk" class="mb-tree-node mb-wWrap"
+                    style="position:absolute;left:-9.5px;top:45.5px;width:0px;height:0px;z-index:2">
+                    <div id="mb-1gvcub3" class="mb-tree-node mb-wRichText mb-rich-text mb-h-center"
+                      style="position:absolute;left:-328.5px;top:-13px;width:657px;height:26px;z-index:1;color:rgba(255,255,255,1);font-family:SourceHanSansSC;font-size:17px;line-height:25px;text-align:center;overflow:hidden">
+                      <p style="line-height:25px"><span
+                          style="color:rgba(255,255,255,1);font-family:SourceHanSansSC;font-size:17px;line-height:25px">为迅速表达想法、与团队同步节奏、高效团队协作而生的云端平台</span>
+                      </p>
+                    </div>
+                  </div>
+                  <div id="mb-6obq8l" class="mb-tree-node mb-wRichText mb-rich-text mb-h-center"
+                    style="position:absolute;left:-338px;top:-58.5px;width:676px;height:91px;z-index:1;color:rgb(255,255,255);font-family:SourceHanSansSC;font-size:60px;line-height:89px;text-align:center;overflow:hidden">
+                    <p style="line-height:89px"><span
+                        style="color:rgb(255,255,255);font-family:SourceHanSansSC;font-size:60px;line-height:89px">产品设计
+                        不止于快</span></p>
+                  </div>
+                </div>
+              </div>
+              <div data-mb-cid="ik889fx8VVX21dRidPRh6F" data-mb-type="wImage" id="mb-iixb3e"
+                class="mb-tree-node mb-wImage mb-s-174fcat"
+                style="position:absolute;left:-479px;top:-188px;width:958px;height:435px;z-index:1">
+                <div class="mb-image-wrapper" style="width:100%;height:100%;border-radius:inherit;overflow:hidden">
+                  <div class="mb-image-container" style="top:0px;left:0px;width:958px;height:435px">
+                    <img class="mb-img" src="/uploads4/images/4542/45427724/v2_q6vkw3.png" alt="图片 3"
+                      style="width:958px;height:565.73px;transform:translate(0px,0px)" draggable="false">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ============ 标签区 ============ -->
+            <div data-mb-cid="VVXGZXaB5IUFZw" data-mb-type="wBasket" id="mb-muwlmj" class="mb-tree-node mb-wBasket"
+              style="position:absolute;left:634px;top:686px;width:570px;height:40px;z-index:17;overflow:hidden">
+              <div data-mb-cid="rcUSByRjUk2trLXiAUK0B7" data-mb-type="rResCanvas" id="mb-1e8vlgi"
+                class="mb-tree-node mb-rResCanvas"
+                style="position:absolute;left:0;top:0;width:570px;height:40px;z-index:5;border-radius:0px"
+                data-mb-basket-canvas="true">
+                <div class="mb-canvas-viewport" style="background:transparent">
+                  <div class="mb-container-content mb-isClipContent" style="background:transparent">
+                    <div data-mb-cid="USBOIK3pVVXGZXW9godYWY" data-mb-type="wIcon" id="mb-1u7zfw3"
+                      class="mb-tree-node mb-wIcon mb-s-1340zf0"
+                      style="position:absolute;left:548px;top:11px;width:18px;height:18px;z-index:202">
+                      <span class="mb-icon mb-svg-icon-wrap"
+                        style="position:relative;display:block;width:100%;height:100%;min-width:18px;min-height:18px;--mb-icon-fill:rgba(245,108,108,1)">
+                        <svg class="mb-svg-icon-path-icon mb-fill" viewBox="0 0 32 32" width="18" height="18"
+                          aria-hidden="true">
+                          <use href="#mb-svg-vd3ezk"></use>
+                        </svg>
+                      </span>
+                    </div>
+                    <div data-mb-cid="USBOIK3pVVXGZXWw0figG6" data-mb-type="wIcon" id="mb-64xmsj"
+                      class="mb-tree-node mb-wIcon mb-s-1340zf0"
+                      style="position:absolute;left:428px;top:11px;width:18px;height:18px;z-index:201">
+                      <span class="mb-icon mb-svg-icon-wrap"
+                        style="position:relative;display:block;width:100%;height:100%;min-width:18px;min-height:18px;--mb-icon-fill:rgba(230,162,60,1)">
+                        <svg class="mb-svg-icon-path-icon mb-fill" viewBox="0 0 32 32" width="18" height="18"
+                          aria-hidden="true">
+                          <use href="#mb-svg-vd3ezk"></use>
+                        </svg>
+                      </span>
+                    </div>
+                    <div data-mb-cid="USBOIK3pVVXGZXWs4P0mFp" data-mb-type="wIcon" id="mb-ekpyfd"
+                      class="mb-tree-node mb-wIcon mb-s-1340zf0"
+                      style="position:absolute;left:306px;top:11px;width:18px;height:18px;z-index:200">
+                      <span class="mb-icon mb-svg-icon-wrap"
+                        style="position:relative;display:block;width:100%;height:100%;min-width:18px;min-height:18px;--mb-icon-fill:rgba(144,147,153,1)">
+                        <svg class="mb-svg-icon-path-icon mb-fill" viewBox="0 0 32 32" width="18" height="18"
+                          aria-hidden="true">
+                          <use href="#mb-svg-vd3ezk"></use>
+                        </svg>
+                      </span>
+                    </div>
+                    <div data-mb-cid="USBOIK3pVVXGZXXxN0PHVx" data-mb-type="wIcon" id="mb-wwqfca"
+                      class="mb-tree-node mb-wIcon mb-s-1340zf0"
+                      style="position:absolute;left:186px;top:11px;width:18px;height:18px;z-index:199">
+                      <span class="mb-icon mb-svg-icon-wrap"
+                        style="position:relative;display:block;width:100%;height:100%;min-width:18px;min-height:18px;--mb-icon-fill:rgba(103,194,58,1)">
+                        <svg class="mb-svg-icon-path-icon mb-fill" viewBox="0 0 32 32" width="18" height="18"
+                          aria-hidden="true">
+                          <use href="#mb-svg-vd3ezk"></use>
+                        </svg>
+                      </span>
+                    </div>
+                    <div data-mb-cid="USBOIK3pVVXGZXXH4RWdwV" data-mb-type="wIcon" id="mb-jm05ku"
+                      class="mb-tree-node mb-wIcon mb-s-1340zf0"
+                      style="position:absolute;left:67px;top:11px;width:18px;height:18px;z-index:198">
+                      <span class="mb-icon mb-svg-icon-wrap"
+                        style="position:relative;display:block;width:100%;height:100%;min-width:18px;min-height:18px;--mb-icon-fill:rgba(64,158,255,1)">
+                        <svg class="mb-svg-icon-path-icon mb-fill" viewBox="0 0 32 32" width="18" height="18"
+                          aria-hidden="true">
+                          <use href="#mb-svg-vd3ezk"></use>
+                        </svg>
+                      </span>
+                    </div>
+                    <div id="mb-1criaon" class="mb-tree-node mb-wRect mb-rich-text mb-h-left mb-s-kw9ed0"
+                      style="position:absolute;left:480px;top:0px;width:90px;height:40px;z-index:197;overflow:hidden">
+                      <p class="mb-rs-da01c7"><span class="mb-rs-pp5eht"> 标签五</span></p>
+                    </div>
+                    <div id="mb-11jxk1c" class="mb-tree-node mb-wRect mb-rich-text mb-h-left mb-s-aa16mw"
+                      style="position:absolute;left:360px;top:0px;width:90px;height:40px;z-index:196;overflow:hidden">
+                      <p class="mb-rs-da01c7"><span class="mb-rs-17k7lca"> 标签四</span></p>
+                    </div>
+                    <div id="mb-131zqou" class="mb-tree-node mb-wRect mb-rich-text mb-h-left mb-s-1ex8mot"
+                      style="position:absolute;left:240px;top:0px;width:90px;height:40px;z-index:195;overflow:hidden">
+                      <p class="mb-rs-da01c7"><span class="mb-rs-194ow58"> 标签三</span></p>
+                    </div>
+                    <div id="mb-1eu8z1v" class="mb-tree-node mb-wRect mb-rich-text mb-h-left mb-s-xamaea"
+                      style="position:absolute;left:120px;top:0px;width:90px;height:40px;z-index:194;overflow:hidden">
+                      <p class="mb-rs-da01c7"><span class="mb-rs-1tdyrbl"> 标签二</span></p>
+                    </div>
+                    <div id="mb-1ghndej" class="mb-tree-node mb-wRect mb-rich-text mb-h-left mb-s-1sn24p8"
+                      style="position:absolute;left:0px;top:0px;width:90px;height:40px;z-index:193;overflow:hidden">
+                      <p class="mb-rs-da01c7"><span class="mb-rs-19qbd7q"> 标签一</span></p>
+                    </div>
+                    <div data-mb-cid="TtTUKk15VVXGZXXYHDDgFt" data-mb-type="wLr" id="mb-13jqr69"
+                      class="mb-tree-node mb-wLr"
+                      style="position:absolute;left:59px;top:0px;width:31px;height:40px;z-index:203;cursor:pointer">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ============ 卡片区（6 张卡片，保留原布局） ============ -->
+            <!-- 卡片 1 -->
+            <div data-mb-cid="VVXFCroqevSa3X" data-mb-type="wBasket" id="mb-d8j9u2" class="mb-tree-node mb-wBasket"
+              style="position:absolute;left:206px;top:754px;width:492px;height:216px;z-index:10;overflow:hidden">
+              <div data-mb-cid="rcUkJ9a4jwJc6YOa" data-mb-type="rResCanvas" id="mb-o71w9j"
+                class="mb-tree-node mb-rResCanvas"
+                style="position:absolute;left:0;top:0;width:527px;height:220px;z-index:5;border-radius:0px"
+                data-mb-basket-canvas="true">
+                <div class="mb-canvas-viewport" style="background:transparent">
+                  <div class="mb-container-content mb-isClipContent" style="background:transparent">
+                    <div data-mb-cid="wbU1n1eXVVXFU5ZNdAW5Qz" data-mb-type="wBasket" id="mb-aep7om"
+                      class="mb-tree-node mb-wBasket"
+                      style="position:absolute;left:263px;top:164px;width:80px;height:32px;z-index:152;overflow:hidden">
+                      <div data-mb-cid="rcU1n1eXVVXFU5Z7yZQA6C" data-mb-type="rResCanvas" id="mb-37y409"
+                        class="mb-tree-node mb-rResCanvas"
+                        style="position:absolute;left:0;top:0;width:80px;height:32px;z-index:5;border-radius:0px"
+                        data-mb-basket-canvas="true">
+                        <div class="mb-canvas-viewport" style="background:transparent">
+                          <div class="mb-container-content mb-isClipContent" style="background:transparent">
+                            <div id="mb-121wrln" class="mb-tree-node mb-wRect mb-rich-text mb-h-center mb-s-17c7l1c"
+                              style="position:absolute;left:0px;top:0px;width:80px;height:32px;z-index:529;overflow:hidden">
+                              <p class="mb-rs-da01c7"><span class="mb-rs-62z12g">操作按钮</span></p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div id="mb-l293nh" class="mb-tree-node mb-wRichText mb-rich-text mb-h-left mb-s-d3f8nu"
+                      style="position:absolute;left:263px;top:60px;width:247px;height:40px;z-index:151;overflow:hidden">
+                      <p class="mb-rs-da01c7"><span class="mb-rs-13xwn5e">内容信息内容信息内容信息内容信息内容信息内容信息内容信息。</span></p>
+                    </div>
+                    <div data-mb-cid="UUFunXTgVVXFU5ZKNPYVGB" data-mb-type="wImage" id="mb-m58dzm"
+                      class="mb-tree-node mb-wImage mb-s-19vrot9"
+                      style="position:absolute;left:1px;top:0px;width:236.92px;height:220px;z-index:150">
+                      <div class="mb-image-wrapper"
+                        style="width:100%;height:100%;border-radius:inherit;overflow:hidden">
+                        <div class="mb-image-container" style="">
+                          <img class="mb-img" src="/uploads7/images/14149/141496496/v2_sn0wo0.png" alt="图片 2"
+                            style="width:237.26px;height:220px;transform:translate(-0.17px,0px)" draggable="false">
+                        </div>
+                      </div>
+                    </div>
+                    <div id="mb-sjlp34" class="mb-tree-node mb-wRichText mb-rich-text mb-h-left mb-s-1tw355"
+                      style="position:absolute;left:263px;top:27px;width:187px;height:23px;z-index:149;overflow:visible">
+                      <p class="mb-rs-18nf16q"><span class="mb-rs-wxpv4b">壮丽的海浪在夕阳下翻滚</span></p>
+                    </div>
+                    <div data-mb-cid="TtTTvIjJVVXFU5Z1auKz9J" data-mb-type="wRect" id="mb-up9q39"
+                      class="mb-tree-node mb-wRect mb-s-11m2r0v"
+                      style="position:absolute;left:0px;top:0px;width:527px;height:220px;z-index:148"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 卡片 2 -->
+            <div data-mb-cid="VVXFN87NDnrgvO" data-mb-type="wBasket" id="mb-qs4tg6" class="mb-tree-node mb-wBasket"
+              style="position:absolute;left:730px;top:754px;width:492px;height:216px;z-index:11;overflow:hidden">
+              <div data-mb-cid="rcUkJ9a4jwJc6YOa" data-mb-type="rResCanvas" id="mb-o71w9j-2"
+                class="mb-tree-node mb-rResCanvas"
+                style="position:absolute;left:0;top:0;width:527px;height:220px;z-index:5;border-radius:0px"
+                data-mb-basket-canvas="true">
+                <div class="mb-canvas-viewport" style="background:transparent">
+                  <div class="mb-container-content mb-isClipContent" style="background:transparent">
+                    <div data-mb-cid="wbU1n1eXVVXFU5ZNdAW5Qz" data-mb-type="wBasket" id="mb-aep7om-2"
+                      class="mb-tree-node mb-wBasket"
+                      style="position:absolute;left:263px;top:164px;width:80px;height:32px;z-index:152;overflow:hidden">
+                      <div data-mb-cid="rcU1n1eXVVXFU5Z7yZQA6C" data-mb-type="rResCanvas" id="mb-37y409-2"
+                        class="mb-tree-node mb-rResCanvas"
+                        style="position:absolute;left:0;top:0;width:80px;height:32px;z-index:5;border-radius:0px"
+                        data-mb-basket-canvas="true">
+                        <div class="mb-canvas-viewport" style="background:transparent">
+                          <div class="mb-container-content mb-isClipContent" style="background:transparent">
+                            <div id="mb-121wrln-2" class="mb-tree-node mb-wRect mb-rich-text mb-h-center mb-s-17c7l1c"
+                              style="position:absolute;left:0px;top:0px;width:80px;height:32px;z-index:529;overflow:hidden">
+                              <p class="mb-rs-da01c7"><span class="mb-rs-62z12g">操作按钮</span></p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div id="mb-l293nh-2" class="mb-tree-node mb-wRichText mb-rich-text mb-h-left mb-s-d3f8nu"
+                      style="position:absolute;left:263px;top:60px;width:247px;height:40px;z-index:151;overflow:hidden">
+                      <p class="mb-rs-da01c7"><span class="mb-rs-13xwn5e">内容信息内容信息内容信息内容信息内容信息内容信息内容信息。</span></p>
+                    </div>
+                    <div data-mb-cid="UUFunXTgVVXFU5ZKNPYVGB" data-mb-type="wImage" id="mb-m58dzm-2"
+                      class="mb-tree-node mb-wImage mb-s-19vrot9"
+                      style="position:absolute;left:1px;top:0px;width:236.92px;height:220px;z-index:150">
+                      <div class="mb-image-wrapper"
+                        style="width:100%;height:100%;border-radius:inherit;overflow:hidden">
+                        <div class="mb-image-container" style="">
+                          <img class="mb-img" src="/uploads7/images/14149/141496496/v2_sn0wo0.png" alt="图片 2"
+                            style="width:237.26px;height:220px;transform:translate(-0.17px,0px)" draggable="false">
+                        </div>
+                      </div>
+                    </div>
+                    <div id="mb-sjlp34-2" class="mb-tree-node mb-wRichText mb-rich-text mb-h-left mb-s-1tw355"
+                      style="position:absolute;left:263px;top:27px;width:187px;height:23px;z-index:149;overflow:visible">
+                      <p class="mb-rs-18nf16q"><span class="mb-rs-wxpv4b">壮丽的海浪在夕阳下翻滚</span></p>
+                    </div>
+                    <div data-mb-cid="TtTTvIjJVVXFU5Z1auKz9J" data-mb-type="wRect" id="mb-up9q39-2"
+                      class="mb-tree-node mb-wRect mb-s-11m2r0v"
+                      style="position:absolute;left:0px;top:0px;width:527px;height:220px;z-index:148"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 卡片 3 -->
+            <div data-mb-cid="VVXFPo5Qru7ZBq" data-mb-type="wBasket" id="mb-1wn8ql5" class="mb-tree-node mb-wBasket"
+              style="position:absolute;left:1242px;top:754px;width:492px;height:216px;z-index:12;overflow:hidden">
+              <div data-mb-cid="rcUkJ9a4jwJc6YOa" data-mb-type="rResCanvas" id="mb-o71w9j-3"
+                class="mb-tree-node mb-rResCanvas"
+                style="position:absolute;left:0;top:0;width:527px;height:220px;z-index:5;border-radius:0px"
+                data-mb-basket-canvas="true">
+                <div class="mb-canvas-viewport" style="background:transparent">
+                  <div class="mb-container-content mb-isClipContent" style="background:transparent">
+                    <div data-mb-cid="wbU1n1eXVVXFU5ZNdAW5Qz" data-mb-type="wBasket" id="mb-aep7om-3"
+                      class="mb-tree-node mb-wBasket"
+                      style="position:absolute;left:263px;top:164px;width:80px;height:32px;z-index:152;overflow:hidden">
+                      <div data-mb-cid="rcU1n1eXVVXFU5Z7yZQA6C" data-mb-type="rResCanvas" id="mb-37y409-3"
+                        class="mb-tree-node mb-rResCanvas"
+                        style="position:absolute;left:0;top:0;width:80px;height:32px;z-index:5;border-radius:0px"
+                        data-mb-basket-canvas="true">
+                        <div class="mb-canvas-viewport" style="background:transparent">
+                          <div class="mb-container-content mb-isClipContent" style="background:transparent">
+                            <div id="mb-121wrln-3" class="mb-tree-node mb-wRect mb-rich-text mb-h-center mb-s-17c7l1c"
+                              style="position:absolute;left:0px;top:0px;width:80px;height:32px;z-index:529;overflow:hidden">
+                              <p class="mb-rs-da01c7"><span class="mb-rs-62z12g">操作按钮</span></p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div id="mb-l293nh-3" class="mb-tree-node mb-wRichText mb-rich-text mb-h-left mb-s-d3f8nu"
+                      style="position:absolute;left:263px;top:60px;width:247px;height:40px;z-index:151;overflow:hidden">
+                      <p class="mb-rs-da01c7"><span class="mb-rs-13xwn5e">内容信息内容信息内容信息内容信息内容信息内容信息内容信息。</span></p>
+                    </div>
+                    <div data-mb-cid="UUFunXTgVVXFU5ZKNPYVGB" data-mb-type="wImage" id="mb-m58dzm-3"
+                      class="mb-tree-node mb-wImage mb-s-19vrot9"
+                      style="position:absolute;left:1px;top:0px;width:236.92px;height:220px;z-index:150">
+                      <div class="mb-image-wrapper"
+                        style="width:100%;height:100%;border-radius:inherit;overflow:hidden">
+                        <div class="mb-image-container" style="">
+                          <img class="mb-img" src="/uploads7/images/14149/141496496/v2_sn0wo0.png" alt="图片 2"
+                            style="width:237.26px;height:220px;transform:translate(-0.17px,0px)" draggable="false">
+                        </div>
+                      </div>
+                    </div>
+                    <div id="mb-sjlp34-3" class="mb-tree-node mb-wRichText mb-rich-text mb-h-left mb-s-1tw355"
+                      style="position:absolute;left:263px;top:27px;width:187px;height:23px;z-index:149;overflow:visible">
+                      <p class="mb-rs-18nf16q"><span class="mb-rs-wxpv4b">壮丽的海浪在夕阳下翻滚</span></p>
+                    </div>
+                    <div data-mb-cid="TtTTvIjJVVXFU5Z1auKz9J" data-mb-type="wRect" id="mb-up9q39-3"
+                      class="mb-tree-node mb-wRect mb-s-11m2r0v"
+                      style="position:absolute;left:0px;top:0px;width:527px;height:220px;z-index:148"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 卡片 4 -->
+            <div data-mb-cid="VVXFCroqVVXFWyLlfggYCY" data-mb-type="wBasket" id="mb-1lxh6bb"
+              class="mb-tree-node mb-wBasket"
+              style="position:absolute;left:206px;top:970px;width:492px;height:216px;z-index:13;overflow:hidden">
+              <div data-mb-cid="rcUkJ9a4jwJc6YOa" data-mb-type="rResCanvas" id="mb-o71w9j-4"
+                class="mb-tree-node mb-rResCanvas"
+                style="position:absolute;left:0;top:0;width:527px;height:220px;z-index:5;border-radius:0px"
+                data-mb-basket-canvas="true">
+                <div class="mb-canvas-viewport" style="background:transparent">
+                  <div class="mb-container-content mb-isClipContent" style="background:transparent">
+                    <div data-mb-cid="wbU1n1eXVVXFU5ZNdAW5Qz" data-mb-type="wBasket" id="mb-aep7om-4"
+                      class="mb-tree-node mb-wBasket"
+                      style="position:absolute;left:263px;top:164px;width:80px;height:32px;z-index:152;overflow:hidden">
+                      <div data-mb-cid="rcU1n1eXVVXFU5Z7yZQA6C" data-mb-type="rResCanvas" id="mb-37y409-4"
+                        class="mb-tree-node mb-rResCanvas"
+                        style="position:absolute;left:0;top:0;width:80px;height:32px;z-index:5;border-radius:0px"
+                        data-mb-basket-canvas="true">
+                        <div class="mb-canvas-viewport" style="background:transparent">
+                          <div class="mb-container-content mb-isClipContent" style="background:transparent">
+                            <div id="mb-121wrln-4" class="mb-tree-node mb-wRect mb-rich-text mb-h-center mb-s-17c7l1c"
+                              style="position:absolute;left:0px;top:0px;width:80px;height:32px;z-index:529;overflow:hidden">
+                              <p class="mb-rs-da01c7"><span class="mb-rs-62z12g">操作按钮</span></p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div id="mb-l293nh-4" class="mb-tree-node mb-wRichText mb-rich-text mb-h-left mb-s-d3f8nu"
+                      style="position:absolute;left:263px;top:60px;width:247px;height:40px;z-index:151;overflow:hidden">
+                      <p class="mb-rs-da01c7"><span class="mb-rs-13xwn5e">内容信息内容信息内容信息内容信息内容信息内容信息内容信息。</span></p>
+                    </div>
+                    <div data-mb-cid="UUFunXTgVVXFU5ZKNPYVGB" data-mb-type="wImage" id="mb-m58dzm-4"
+                      class="mb-tree-node mb-wImage mb-s-19vrot9"
+                      style="position:absolute;left:1px;top:0px;width:236.92px;height:220px;z-index:150">
+                      <div class="mb-image-wrapper"
+                        style="width:100%;height:100%;border-radius:inherit;overflow:hidden">
+                        <div class="mb-image-container" style="">
+                          <img class="mb-img" src="/uploads7/images/14149/141496496/v2_sn0wo0.png" alt="图片 2"
+                            style="width:237.26px;height:220px;transform:translate(-0.17px,0px)" draggable="false">
+                        </div>
+                      </div>
+                    </div>
+                    <div id="mb-sjlp34-4" class="mb-tree-node mb-wRichText mb-rich-text mb-h-left mb-s-1tw355"
+                      style="position:absolute;left:263px;top:27px;width:187px;height:23px;z-index:149;overflow:visible">
+                      <p class="mb-rs-18nf16q"><span class="mb-rs-wxpv4b">壮丽的海浪在夕阳下翻滚</span></p>
+                    </div>
+                    <div data-mb-cid="TtTTvIjJVVXFU5Z1auKz9J" data-mb-type="wRect" id="mb-up9q39-4"
+                      class="mb-tree-node mb-wRect mb-s-11m2r0v"
+                      style="position:absolute;left:0px;top:0px;width:527px;height:220px;z-index:148"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 卡片 5 -->
+            <div data-mb-cid="VVXFN87NVVXFWyL8nfrqPP" data-mb-type="wBasket" id="mb-1qzm66f"
+              class="mb-tree-node mb-wBasket"
+              style="position:absolute;left:730px;top:970px;width:492px;height:216px;z-index:14;overflow:hidden">
+              <div data-mb-cid="rcUkJ9a4jwJc6YOa" data-mb-type="rResCanvas" id="mb-o71w9j-5"
+                class="mb-tree-node mb-rResCanvas"
+                style="position:absolute;left:0;top:0;width:527px;height:220px;z-index:5;border-radius:0px"
+                data-mb-basket-canvas="true">
+                <div class="mb-canvas-viewport" style="background:transparent">
+                  <div class="mb-container-content mb-isClipContent" style="background:transparent">
+                    <div data-mb-cid="wbU1n1eXVVXFU5ZNdAW5Qz" data-mb-type="wBasket" id="mb-aep7om-5"
+                      class="mb-tree-node mb-wBasket"
+                      style="position:absolute;left:263px;top:164px;width:80px;height:32px;z-index:152;overflow:hidden">
+                      <div data-mb-cid="rcU1n1eXVVXFU5Z7yZQA6C" data-mb-type="rResCanvas" id="mb-37y409-5"
+                        class="mb-tree-node mb-rResCanvas"
+                        style="position:absolute;left:0;top:0;width:80px;height:32px;z-index:5;border-radius:0px"
+                        data-mb-basket-canvas="true">
+                        <div class="mb-canvas-viewport" style="background:transparent">
+                          <div class="mb-container-content mb-isClipContent" style="background:transparent">
+                            <div id="mb-121wrln-5" class="mb-tree-node mb-wRect mb-rich-text mb-h-center mb-s-17c7l1c"
+                              style="position:absolute;left:0px;top:0px;width:80px;height:32px;z-index:529;overflow:hidden">
+                              <p class="mb-rs-da01c7"><span class="mb-rs-62z12g">操作按钮</span></p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div id="mb-l293nh-5" class="mb-tree-node mb-wRichText mb-rich-text mb-h-left mb-s-d3f8nu"
+                      style="position:absolute;left:263px;top:60px;width:247px;height:40px;z-index:151;overflow:hidden">
+                      <p class="mb-rs-da01c7"><span class="mb-rs-13xwn5e">内容信息内容信息内容信息内容信息内容信息内容信息内容信息。</span></p>
+                    </div>
+                    <div data-mb-cid="UUFunXTgVVXFU5ZKNPYVGB" data-mb-type="wImage" id="mb-m58dzm-5"
+                      class="mb-tree-node mb-wImage mb-s-19vrot9"
+                      style="position:absolute;left:1px;top:0px;width:236.92px;height:220px;z-index:150">
+                      <div class="mb-image-wrapper"
+                        style="width:100%;height:100%;border-radius:inherit;overflow:hidden">
+                        <div class="mb-image-container" style="">
+                          <img class="mb-img" src="/uploads7/images/14149/141496496/v2_sn0wo0.png" alt="图片 2"
+                            style="width:237.26px;height:220px;transform:translate(-0.17px,0px)" draggable="false">
+                        </div>
+                      </div>
+                    </div>
+                    <div id="mb-sjlp34-5" class="mb-tree-node mb-wRichText mb-rich-text mb-h-left mb-s-1tw355"
+                      style="position:absolute;left:263px;top:27px;width:187px;height:23px;z-index:149;overflow:visible">
+                      <p class="mb-rs-18nf16q"><span class="mb-rs-wxpv4b">壮丽的海浪在夕阳下翻滚</span></p>
+                    </div>
+                    <div data-mb-cid="TtTTvIjJVVXFU5Z1auKz9J" data-mb-type="wRect" id="mb-up9q39-5"
+                      class="mb-tree-node mb-wRect mb-s-11m2r0v"
+                      style="position:absolute;left:0px;top:0px;width:527px;height:220px;z-index:148"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 卡片 6 -->
+            <div data-mb-cid="VVXFPo5QVVXFWyLHezyLaS" data-mb-type="wBasket" id="mb-1qtcd8"
+              class="mb-tree-node mb-wBasket"
+              style="position:absolute;left:1242px;top:970px;width:492px;height:216px;z-index:15;overflow:hidden">
+              <div data-mb-cid="rcUkJ9a4jwJc6YOa" data-mb-type="rResCanvas" id="mb-o71w9j-6"
+                class="mb-tree-node mb-rResCanvas"
+                style="position:absolute;left:0;top:0;width:527px;height:220px;z-index:5;border-radius:0px"
+                data-mb-basket-canvas="true">
+                <div class="mb-canvas-viewport" style="background:transparent">
+                  <div class="mb-container-content mb-isClipContent" style="background:transparent">
+                    <div data-mb-cid="wbU1n1eXVVXFU5ZNdAW5Qz" data-mb-type="wBasket" id="mb-aep7om-6"
+                      class="mb-tree-node mb-wBasket"
+                      style="position:absolute;left:263px;top:164px;width:80px;height:32px;z-index:152;overflow:hidden">
+                      <div data-mb-cid="rcU1n1eXVVXFU5Z7yZQA6C" data-mb-type="rResCanvas" id="mb-37y409-6"
+                        class="mb-tree-node mb-rResCanvas"
+                        style="position:absolute;left:0;top:0;width:80px;height:32px;z-index:5;border-radius:0px"
+                        data-mb-basket-canvas="true">
+                        <div class="mb-canvas-viewport" style="background:transparent">
+                          <div class="mb-container-content mb-isClipContent" style="background:transparent">
+                            <div id="mb-121wrln-6" class="mb-tree-node mb-wRect mb-rich-text mb-h-center mb-s-17c7l1c"
+                              style="position:absolute;left:0px;top:0px;width:80px;height:32px;z-index:529;overflow:hidden">
+                              <p class="mb-rs-da01c7"><span class="mb-rs-62z12g">操作按钮</span></p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div id="mb-l293nh-6" class="mb-tree-node mb-wRichText mb-rich-text mb-h-left mb-s-d3f8nu"
+                      style="position:absolute;left:263px;top:60px;width:247px;height:40px;z-index:151;overflow:hidden">
+                      <p class="mb-rs-da01c7"><span class="mb-rs-13xwn5e">内容信息内容信息内容信息内容信息内容信息内容信息内容信息。</span></p>
+                    </div>
+                    <div data-mb-cid="UUFunXTgVVXFU5ZKNPYVGB" data-mb-type="wImage" id="mb-m58dzm-6"
+                      class="mb-tree-node mb-wImage mb-s-19vrot9"
+                      style="position:absolute;left:1px;top:0px;width:236.92px;height:220px;z-index:150">
+                      <div class="mb-image-wrapper"
+                        style="width:100%;height:100%;border-radius:inherit;overflow:hidden">
+                        <div class="mb-image-container" style="">
+                          <img class="mb-img" src="/uploads7/images/14149/141496496/v2_sn0wo0.png" alt="图片 2"
+                            style="width:237.26px;height:220px;transform:translate(-0.17px,0px)" draggable="false">
+                        </div>
+                      </div>
+                    </div>
+                    <div id="mb-sjlp34-6" class="mb-tree-node mb-wRichText mb-rich-text mb-h-left mb-s-1tw355"
+                      style="position:absolute;left:263px;top:27px;width:187px;height:23px;z-index:149;overflow:visible">
+                      <p class="mb-rs-18nf16q"><span class="mb-rs-wxpv4b">壮丽的海浪在夕阳下翻滚</span></p>
+                    </div>
+                    <div data-mb-cid="TtTTvIjJVVXFU5Z1auKz9J" data-mb-type="wRect" id="mb-up9q39-6"
+                      class="mb-tree-node mb-wRect mb-s-11m2r0v"
+                      style="position:absolute;left:0px;top:0px;width:527px;height:220px;z-index:148"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ============ 评分组件（原布局保留） ============ -->
+            <div data-mb-cid="VVXHj6tWrBn7U1" data-mb-type="wBasket" id="mb-1alnp8h" class="mb-tree-node mb-wBasket"
+              style="position:absolute;left:452px;top:754px;width:124px;height:24px;z-index:18;overflow:hidden">
+              <div data-mb-cid="rcURnZRMUk2raJWP5nb6Yr" data-mb-type="rResCanvas" id="mb-1496ve8"
+                class="mb-tree-node mb-rResCanvas"
+                style="position:absolute;left:0;top:0;width:124px;height:24px;z-index:5;border-radius:0px"
+                data-mb-basket-canvas="true">
+                <div class="mb-canvas-viewport" style="background:transparent">
+                  <div class="mb-container-content mb-isClipContent" style="background:transparent">
+                    <div data-mb-cid="wbURndFGVVXHj6o8BBGgKS" data-mb-type="wBasket" id="mb-1kayjox"
+                      class="mb-tree-node mb-wBasket"
+                      style="position:absolute;left:0px;top:0px;width:24px;height:24px;z-index:186;cursor:pointer;overflow:hidden">
+                      <div data-mb-cid="rcURndFGVVXHj6oXXyMcOK" data-mb-type="rResCanvas" id="mb-li5mnm"
+                        class="mb-tree-node mb-rResCanvas"
+                        style="position:absolute;left:0;top:0;width:24px;height:24px;z-index:5;border-radius:0px"
+                        data-mb-basket-canvas="true">
+                        <div class="mb-canvas-viewport" style="background:transparent">
+                          <div class="mb-container-content mb-isClipContent" style="background:transparent">
+                            <div data-mb-cid="URnYhYPlVVXHj6owAOEuTI" data-mb-type="wIcon" id="mb-1jgy757"
+                              class="mb-tree-node mb-wIcon mb-s-1340zf0"
+                              style="position:absolute;left:0px;top:0px;width:24px;height:24px;z-index:186">
+                              <span class="mb-icon mb-svg-icon-wrap"
+                                style="position:relative;display:block;width:100%;height:100%;min-width:24px;min-height:24px;--mb-icon-fill:rgba(192,196,204,1)">
+                                <svg class="mb-svg-icon-path-icon mb-fill" viewBox="64 64 896 896" width="24"
+                                  height="24" aria-hidden="true">
+                                  <use href="#mb-svg-17uhwdq"></use>
+                                </svg>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- 后续星星结构相同，此处省略其余 4 颗星的重复标记 -->
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </main>
+    <div id="mb-runtime-overlay-root" class="mb-runtime-overlay-root" aria-live="polite"></div>
+  </div>
+
+  <!-- ================= 运行时脚本（保留原有交互逻辑） ================= -->
+  <script type="application/json" id="mb-runtime-manifest">
+{"version":1,"features":["router","events","controllers","actions","variables","transitions"],"initialCanvasKey":"rcVVWxfbWM3Csg6e","canvases":{"rcVVWxfbWM3Csg6e":{"pageKey":"rbpVVWxfbVzPGhk63","order":1,"domId":"mb-q6iqi8","route":"#%E9%A1%B5%E9%9D%A2%201","overlay":false,"widgetKeys":["VVXJPrWIomEfRg","rcUkJ6i5QWamcX3H","wbUTdgDBVVXJPrT2bS8d2q","rcUTdgDBVVXJPrTcwyFijK","wwUTdaOOVVXJPrTrPApuC3","wbU1n047VVXJPrTfQZVg5M","rcU1n047VVXJPrTB1iRbWm","TtTTvIjJVVXJPrTMcVYcGl","rclrkac7VVXJPrTB1q7RdK","TtTTvIjJVVXJPrTAaOMeSX","wbU1n1eXVVXJPrTx9NcZ4n","rcU1n1eXVVXJPrTMYsavy8","TtTTvIjJVVXJPrTO2jWBqX","rcU1n1eXVVXJPrT3lhdKbS","TtTTvIjJVVXJPrTvmXUPTD","TtTTv1aKVVXJPrTWqKTc5M","UTP4O82JVVXJPrTZD18ovs","TtTTv1aKVVXJPrTgfpHP60","TtTTvIjJVVXJPrTHgiSfK4","TtTTvIjJVVXJPrTK9h8e2m","rcUTdgDBVVXJPrTCR5NiOi","wbU1n1SkVVXJPrTCQMZ3ml","rcU1n1SkVVXJPrThN6JZ0m","TtTTvIjJVVXJPrTcYScgp","rclrkajeVVXJPrTfBsuByq","TtTTvIjJVVXJPrTLdQrKpt","wwVVXIutm6Z8hQfk","VVXIreoGHypWU2","TtTULQotVVXIOjlWd4bOqt","VVXHj6tWrBn7U1","rcURnZRMUk2raJWP5nb6Yr","wbURndFGVVXHj6o8BBGgKS","rcURndFGVVXHj6oXXyMcOK","URnYhYPlVVXHj6owAOEuTI","rcURndFGVVXHj6oLGOxjgx","URnYjFvvVVXHj6otDlInv5","wbURndFGVVXHj6oKaXhjYD","rcURndFGVVXHj6oiiKh7rH","URnYhYPlVVXHj6ojuWZyyh","rcURndFGVVXHj6oQF4mfAa","URnYjFvvVVXHj6oZAuhBKO","wbURndFGVVXHj6ozNwWNpy","rcURndFGVVXHj6oRo8UVD6","URnYhYPlVVXHj6o2ui0Dtj","rcURndFGVVXHj6oNHebbih","URnYjFvvVVXHj6og7oHNZE","wbURndFGVVXHj6oUmho1Ml","rcURndFGVVXHj6oOeo24it","URnYhYPlVVXHj6o2Hl6mBZ","rcURndFGVVXHj6ojmK9MZD","URnYjFvvVVXHj6oO9g4pmT","wbURndFGVVXHj6ojMNK5i","rcURndFGVVXHj6ovhaux6F","URnYhYPlVVXHj6olnyNAXk","rcURndFGVVXHj6o9Rd8S0E","URnYjFvvVVXHj6ok8kccZt","rcURnZRMUk2raJWa5RqJ5y","URnYhYPlVVXHj6pdUKlS7A","URnYhYPlVVXHj6p3ILHd7C","URnYhYPlVVXHj6pKv3uBfh","URnYhYPlVVXHj6p7VepEmC","URnYjFvvVVXHj6pvTn6Bsw","rcURnZRMUk2raJWbNUQyuN","URnYjFvvVVXHj6qzElh97Q","URnYhYPlVVXHj6q2b0ftl4","URnYhYPlVVXHj6qAYumjGH","URnYhYPlVVXHj6qQwEaglc","URnYjFvvVVXHj6q1k3alzt","rcURnZRMUk2raJW3JTGkSH","URnYjFvvVVXHj6reaKiAgk","URnYjFvvVVXHj6rUNOmflm","URnYhYPlVVXHj6r8pmFIGd","URnYhYPlVVXHj6rKRdhVIk","URnYjFvvVVXHj6rLTpkl4Z","rcURnZRMUk2raJWXnlTByj","URnYjFvvVVXHj6swfsLqTv","URnYjFvvVVXHj6sp4VZpZN","URnYjFvvVVXHj6sNZGPFqx","URnYhYPlVVXHj6swtPPnzH","URnYjFvvVVXHj6sUFz4fgf","rcURnZRMUk2raJWfgGw4P2","URnYjFvvVVXHj6sxOQaS06","URnYjFvvVVXHj6snBMg8QT","URnYjFvvVVXHj6sc6iS766","URnYjFvvVVXHj6swVaDmIZ","URnYjFvvVVXHj6siBQ3vuA","VVXGZXaB5IUFZw","rcUSByRjUk2trLXiAUK0B7","USBOIK3pVVXGZXW9godYWY","USBOIK3pVVXGZXWw0figG6","USBOIK3pVVXGZXWs4P0mFp","USBOIK3pVVXGZXXxN0PHVx","USBOIK3pVVXGZXXH4RWdwV","TtTTvIjJVVXGZXXoU04y7d","TtTTvIjJVVXGZXXPc9Z0jm","TtTTvIjJVVXGZXXYmwoelj","TtTTvIjJVVXGZXXDwyk2ja","TtTTvIjJVVXGZXXqle17NR","TtTUKk15VVXGZXXYHDDgFt","rcUSByRjUk2trLXSdt14GK","USBOIK3pVVXGZXYTennDZL","USBOIK3pVVXGZXYeJxpoD8","USBOIK3pVVXGZXYnFcseuA","USBOIK3pVVXGZXYjN5OUk6","TtTTvIjJVVXGZXYfDqPHkT","TtTTvIjJVVXGZXYYKC32Xz","TtTTvIjJVVXGZXYUMUaCdj","TtTTvIjJVVXGZXYPYQwAtN","TtTUKk15VVXGZXYNWft82z","rcUSByRjUk2trLXOHUJeA","USBOIK3pVVXGZXZuS1eVOX","USBOIK3pVVXGZXZJA9Ewty","USBOIK3pVVXGZXZXTBykCK","TtTTvIjJVVXGZXZVJnL0bu","TtTTvIjJVVXGZXZYBLjWjp","TtTTvIjJVVXGZXZw9ZCE3n","VVXGWlXyXVZ18u","rcUSBzLtUk2trLXagwcI1f","USBOIK3pVVXGWlR8fQH4IA","TtTTvIjJVVXGWlRAgAZx6s","USBOIK3pVVXGWlR4wFS0Xo","TtTTvIjJVVXGWlRJ1edUi4","USBOIK3pVVXGWlR1f78jaj","TtTTvIjJVVXGWlRxxX5J3m","USBOIK3pVVXGWlRyJ2FAL9","TtTTvIjJVVXGWlRppWKK3n","TtTUKk15VVXGWlR7pgJjYR","rcUSBzLtUk2trLXZbkuNMa","USBOIK3pVVXGWlToSC57NG","TtTTvIjJVVXGWlT5OKOXRQ","USBOIK3pVVXGWlT38Q1ssL","TtTTvIjJVVXGWlT13wQjlJ","USBOIK3pVVXGWlTP1YModn","TtTTvIjJVVXGWlTVCpiGRv","TtTUKk15VVXGWlTfHD0kL8","rcUSBzLtUk2trLX8ZIk4Sv","USBOIK3pVVXGWlVIEVJm3i","TtTTvIjJVVXGWlVvPI3BEv","USBOIK3pVVXGWlVqnhOrrj","TtTTvIjJVVXGWlVglFKi3i","USBOIK3pVVXGWlVivwfSg7","TtTTvIjJVVXGWlVoW2UstG","USBOIK3pVVXGWlVQ6bkODp","TtTTvIjJVVXGWlVEEsH7g","VVXFPo5QVVXFWyLHezyLaS","rcUkJ9a4jwJc6YOa","wbU1n1eXVVXFU5ZNdAW5Qz","rcU1n1eXVVXFU5Z7yZQA6C","TtTTvIjJVVXFU5ZtzL8tqf","rcU1n1eXVVXFU5ZfdWBLQS","TtTTvIjJVVXFU5ZRBGL9PE","TtTTv1aKVVXFU5ZUcpo4Yc","UUFunXTgVVXFU5ZKNPYVGB","TtTTv1aKVVXFU5ZS8X8mtX","TtTTvIjJVVXFU5Z1auKz9J","VVXFN87NVVXFWyL8nfrqPP","rcUkJ9a4jwJc6YOa","wbU1n1eXVVXFU5ZNdAW5Qz","rcU1n1eXVVXFU5Z7yZQA6C","TtTTvIjJVVXFU5ZtzL8tqf","rcU1n1eXVVXFU5ZfdWBLQS","TtTTvIjJVVXFU5ZRBGL9PE","TtTTv1aKVVXFU5ZUcpo4Yc","UUFunXTgVVXFU5ZKNPYVGB","TtTTv1aKVVXFU5ZS8X8mtX","TtTTvIjJVVXFU5Z1auKz9J","VVXFCroqVVXFWyLlfggYCY","rcUkJ9a4jwJc6YOa","wbU1n1eXVVXFU5ZNdAW5Qz","rcU1n1eXVVXFU5Z7yZQA6C","TtTTvIjJVVXFU5ZtzL8tqf","rcU1n1eXVVXFU5ZfdWBLQS","TtTTvIjJVVXFU5ZRBGL9PE","TtTTv1aKVVXFU5ZUcpo4Yc","UUFunXTgVVXFU5ZKNPYVGB","TtTTv1aKVVXFU5ZS8X8mtX","TtTTvIjJVVXFU5Z1auKz9J","VVXFPo5Qru7ZBq","rcUkJ9a4jwJc6YOa","wbU1n1eXVVXFU5ZNdAW5Qz","rcU1n1eXVVXFU5Z7yZQA6C","TtTTvIjJVVXFU5ZtzL8tqf","rcU1n1eXVVXFU5ZfdWBLQS","TtTTvIjJVVXFU5ZRBGL9PE","TtTTv1aKVVXFU5ZUcpo4Yc","UUFunXTgVVXFU5ZKNPYVGB","TtTTv1aKVVXFU5ZS8X8mtX","TtTTvIjJVVXFU5Z1auKz9J","VVXFN87NDnrgvO","rcUkJ9a4jwJc6YOa","wbU1n1eXVVXFU5ZNdAW5Qz","rcU1n1eXVVXFU5Z7yZQA6C","TtTTvIjJVVXFU5ZtzL8tqf","rcU1n1eXVVXFU5ZfdWBLQS","TtTTvIjJVVXFU5ZRBGL9PE","TtTTv1aKVVXFU5ZUcpo4Yc","UUFunXTgVVXFU5ZKNPYVGB","TtTTv1aKVVXFU5ZS8X8mtX","TtTTvIjJVVXFU5Z1auKz9J","VVXFCroqevSa3X","rcUkJ9a4jwJc6YOa","wbU1n1eXVVXFU5ZNdAW5Qz","rcU1n1eXVVXFU5Z7yZQA6C","TtTTvIjJVVXFU5ZtzL8tqf","rcU1n1eXVVXFU5ZfdWBLQS","TtTTvIjJVVXFU5ZRBGL9PE","TtTTv1aKVVXFU5ZUcpo4Yc","UUFunXTgVVXFU5ZKNPYVGB","TtTTv1aKVVXFU5ZS8X8mtX","TtTTvIjJVVXFU5Z1auKz9J","wwVVX8wRwIpyv7e2","VVX8VkOaS5wkI5","rcUTiFheVVX8pMdQpwrdpC","wbU2QdsbVVX8pMdrAzQVzm","rcU2QdsbVVX8pMdZVydhz0","il8h4z8pVVX8pMdFKFB4qX","rcU2QdsbVVX8pMdXTA2l1t","il8h4z8pVVX8pMddpus7HY","il8h4z8pVVX8pMdsNMgyZx","wbUThWrvVVX8pMd9W3wFLs","rcUThWrvVVX8pMdykHBIKd","TtTTv1aKVVX8pMdLym7ULg","wwUThWOqVVX8pMdKVWaTvO","UTgcGuwNVVX8pMdUOPL4lk","TtTTvIjJVVX8pMdvuOlpgK","rcUThWrvVVX8pMdLuNzRmR","TtTTv1aKVVX8pMdz79NFJV","wwUThWOqVVX8pMd2w0D37G","UTgcGuwNVVX8pMdg5Q7VTZ","TtTTvIjJVVX8pMdqLWrGRM","wbUThWpyVVX8pMd1oEWd8C","rcUThWpyVVX8pMd2mNnh2p","TtTTv1aKVVX8pMdSmuRbQa","wwUThWJAVVX8pMdcwi5cDz","UTgc2QRHVVX8pMdeuiObei","TtTTvIjJVVX8pMdgtq68Nd","rcUThWpyVVX8pMdRIv6rm8","TtTTv1aKVVX8pMdcLtoPnr","wwUThWJAVVX8pMd2uBMmfa","UTgc2QRHVVX8pMdoloNMmU","TtTTvIjJVVX8pMdEsn4l4V","wbUThWgxVVX8pMdCdYhRJm","rcUThWgxVVX8pMdW5Hvp6D","TtTTv1aKVVX8pMdnPVMMH5","wwUThWDzVVX8pMdXCJIf8f","UTgc16A3VVX8pMdQevgbvZ","TtTTvIjJVVX8pMdDYMkLFs","rcUThWgxVVX8pMdHXPFHlv","TtTTv1aKVVX8pMdFxlYsXm","wwUThWDzVVX8pMdcnIMqaN","UTgc16A3VVX8pMd4WyKadV","TtTTvIjJVVX8pMdRLLOqtD","wbUThWYgVVX8pMdbL8HS6D","rcUThWYgVVX8pMdURIIVnW","UTgby8PcVVX8pMd7h0Soc5","UTgUvHTgVVX8pMdVYqDtsE","wwUThW8IVVX8pMdgQFtsnS","TtTTv1aKVVX8pMdDB2g4DN","TtTTvIjJVVX8pMdNaggk5e","rcUThWYgVVX8pMdtAOXn5s","UTgby8PcVVX8pMd5VLEkIu","UTgUvHTgVVX8pMdr6HxWwp","wwUThW8IVVX8pMdZIo41cb","TtTTv1aKVVX8pMdf6EOV6n","TtTTvIjJVVX8pMd51U8dxI","TtTTvIjJVVX8pMdkw8LjjE","rcUTiFheVVX8pMd7ggM6QA","wbU2QdsbVVX8pMdn4aRbJA","rcU2QdsbVVX8pMdZ7TDYCj","il8h4z8pVVX8pMdFCK8aL4","rcU2QdsbVVX8pMd1E03izb","il8h4z8pVVX8pMdodds9Qq","il8h4z8pVVX8pMdFq7D4Pv","wbUThWrvVVX8pMdBHlNETI","rcUThWrvVVX8pMdim3jftl","TtTTv1aKVVX8pMdSdGwsma","wwUThWOqVVX8pMduQUIFeC","UTgcGuwNVVX8pMdi1nBlmY","TtTTvIjJVVX8pMdgk8C1PJ","rcUThWrvVVX8pMdXy19nsE","TtTTv1aKVVX8pMdVjjad73","wwUThWOqVVX8pMdt8gOgij","UTgcGuwNVVX8pMdaTo8QBZ","TtTTvIjJVVX8pMdLsVB6gd","wbUThWpyVVX8pMdqGQZy4l","rcUThWpyVVX8pMdbAEhbge","TtTTv1aKVVX8pMdm3S0uoW","wwUThWJAVVX8pMd4SGLyRF","UTgc2QRHVVX8pMdLjQ8mPP","TtTTvIjJVVX8pMdElIrF1z","rcUThWpyVVX8pMdSYYJ1bz","TtTTv1aKVVX8pMdJkhSSIy","wwUThWJAVVX8pMdN7JSF8C","UTgc2QRHVVX8pMdoPZlUV1","TtTTvIjJVVX8pMdO5lacMs","wbUThWgxVVX8pMduHfSV3W","rcUThWgxVVX8pMdiCq0Lgt","TtTTv1aKVVX8pMdbr41F8G","wwUThWDzVVX8pMdhfNnrW9","UTgc16A3VVX8pMdcVzAfYq","TtTTvIjJVVX8pMdMsWxiBY","rcUThWgxVVX8pMdR3C20ZB","TtTTv1aKVVX8pMd1SOeMBY","wwUThWDzVVX8pMdzc9neDT","UTgc16A3VVX8pMdZ7NSIfB","TtTTvIjJVVX8pMdPhgA7V8","TtTTv1aKVVX8pMdMsHi8hk","TtTTv1aKVVX8pMdXdWYcWd","TtTTv1aKVVX8pMdYPvQIts","TtTTv1aKVVX8pMd9MiNjlq","TtTTv1aKVVX8pMdBwAEydi","TtTTv1aKVVX8pMdZfzoDej","wbUThWYgVVX8pMdenitBOa","rcUThWYgVVX8pMdho3y8eT","UTgby8PcVVX8pMdBBNMs0q","UTgUvHTgVVX8pMdeHvyK3w","wwUThW8IVVX8pMd99j26B5","TtTTv1aKVVX8pMdIDuB5kT","TtTTvIjJVVX8pMd540a7m6","rcUThWYgVVX8pMdIYIV5kP","UTgby8PcVVX8pMdeENiv5G","UTgUvHTgVVX8pMdt1Lmri2","wwUThW8IVVX8pMdElQtmSa","TtTTv1aKVVX8pMdOKz8Rul","TtTTvIjJVVX8pMdTI5Rgj9","wwUTiD5dVVX8pMdrbpsgHs","TtTTvIjJVVX8pMdfWIGTg8","rcUTiFheVVX8pMdEZjlCLR","wbU2QdsbVVX8pMdE9G2laI","rcU2QdsbVVX8pMdJPd6XP","il8h4z8pVVX8pMd8JqJAw2","rcU2QdsbVVX8pMdne3DIRN","il8h4z8pVVX8pMdV2wkrK2","il8h4z8pVVX8pMdiEYtaqh","wbUThWrvVVX8pMdMtY807o","rcUThWrvVVX8pMdTpIjfB7","wwUThWOqVVX8pMdwFQHC1E","UTgcGuwNVVX8pMdcJUemui","TtTTvIjJVVX8pMdH3SLA1n","rcUThWrvVVX8pMdsfjFDox","wwUThWOqVVX8pMdHCGgbPN","UTgcGuwNVVX8pMdBdPmJLi","TtTTvIjJVVX8pMdFaDFCAR","wbUThWpyVVX8pMdyvuCIj0","rcUThWpyVVX8pMdx8areB0","wwUThWJAVVX8pMdiB1tAKe","UTgc2QRHVVX8pMdyAA8Mfq","TtTTvIjJVVX8pMdT63UyOE","rcUThWpyVVX8pMd9L9vEzl","wwUThWJAVVX8pMdoV0eqoe","UTgc2QRHVVX8pMdDifFHlv","TtTTvIjJVVX8pMdm39wZ2a","wbUThWgxVVX8pMd13XhXGE","rcUThWgxVVX8pMdg3nopzA","wwUThWDzVVX8pMdobUfO54","UTgc16A3VVX8pMdDXG6KyJ","TtTTvIjJVVX8pMdleLmbqB","rcUThWgxVVX8pMdmGo0kxS","wwUThWDzVVX8pMdgELgH9n","UTgc16A3VVX8pMd5E5Gx78","TtTTvIjJVVX8pMd8moAr7v","wbUThWYgVVX8pMdvbF1U4Y","rcUThWYgVVX8pMdfPCLAg0","UTgby8PcVVX8pMdTt1B2PP","wwUThW8IVVX8pMdfGU6qcZ","TtTTvIjJVVX8pMdHTHlDSM","rcUThWYgVVX8pMd9nQr23s","UTgby8PcVVX8pMdw8QNUdS","wwUThW8IVVX8pMd2mtO7D5","TtTTvIjJVVX8pMdbb6v9lb","TtTTvIjJVVX8pMd1861SM6","VVX7Wz9CzC0xhE","rcUTzdlcUk2y0qcuiihoj8","wbU1n1azVVX7Wz5K1lfG1z","rcU1n1azVVX7Wz5kedzkeZ","TtTTvIjJVVX7Wz5IjbQBxW","rcU1n1azVVX7Wz5wtIHfDi","TtTTvIjJVVX7Wz5w58wkYG","wwUTze0VVVX7Wz5IyhDOVo","TtTTvIjJVVX7Wz5690PxLz","UTxq1iYEVVX7Wz5fSxnxlp","rcUTzdlcUk2y0qcWS94YnN","wbU1n1azVVX7Wz7d7k8kAI","rcU1n1azVVX7Wz7T59KArX","TtTTvIjJVVX7Wz7YejzQWy","rcU1n1azVVX7Wz7uJuUJ2D","TtTTvIjJVVX7Wz7bAGWAJA","wwUTze0VVVX7Wz74iYo90v","UTxq1iYEVVX7Wz7oC0kfiD","TtTTvIjJVVX7Wz7m4VZEL3","wwUTzf3fVVX7Wz7WaxzWB0","wbUTxtomVVX7Wz7KYZuxal","rcUTxtomVVX7Wz7B3jNPs3","ik6rlt9uVVX7Wz7OUzRmsS","rcUTxtomVVX7Wz7PzlJWys","ik6rlt9uVVX7Wz7RWGEpib","ik6rlt9uVVX7Wz7V7vJ3gV","wwUTyGOhVVX7Wz77nsMuoA","wbUTxtomVVX7Wz7VVDGVGw","rcUTxtomVVX7Wz7kbX9WNZ","ik6rlt9uVVX7Wz7tcjJdDh","rcUTxtomVVX7Wz7BpIt1M1","ik6rlt9uVVX7Wz7af0E5Zn","wbUTxtomVVX7Wz7y6fYwcu","rcUTxtomVVX7Wz7r57xQbn","ik6rlt9uVVX7Wz7Mcq3fyg","rcUTxtomVVX7Wz7cL4sjID","ik6rlt9uVVX7Wz7euqZIfw","ik6rlt9uVVX7Wz7ZYlJnT8","wbVVX6x2TxrA2LO4","rcVVX6x2TDtD9pvp","VVX5RgT5Uzy52c","rcUkI70WQ89C4Bon","UT8zDXUjVVX5RgSFd00dx0","rcVVX6x2VVX6x2WgUXCGvY","VVX5RgT5VVX6x2WbYPRpXR","rcUkI70WQ89C4Bon","UT8zDXUjVVX5RgSFd00dx0","wwVVXUEAhXPAoKwM","wwVVXTHHricXfawV","wwVVXTCERsHyV2wp","VVXHYBZpLszhtz","VVXHLkYneKUxcz","rcUkHiyGNr2XDkVy","TtTV0ibAVVXHLkYOyzQ9L4","VVXE5mxiE9XuOi","rcUkIxy3VVXETz5WVY30aO","wbUTgVNjVVXETz4Ri13zd1","rcUTgVNjVVXETz4gjJubKM","wwUTgVeXVVXETz4SK50uxE","UTgUGRQCVVXETz4rfk0lqf","UTgUvHTgVVXETz4K68j5ry","TtTTvIjJVVXETz4L9gs7Hy","rcUTgVNjVVXETz4E0cvTpn","wwU4hQV6VVXETz49DU7PVQ","ik6rlt9uVVXETz5sUrsTMz","ik6rlt9uVVXETz5dqSbX8g","ik6rlt9uVVXETz5fiBgR4b","ik6rlt9uVVXETz5zLuFWeH","wwU4nId3VVXETz5OrUZAEk","ik6rlt9uVVXETz5dRlbgw7","wwUTgWMpVVXETz5Wpq5SEk","UTgUGRQCVVXETz5E0iLV9H","UTgUvHTgVVXETz5s88s8Bt","TtTTvIjJVVXETz5DQRDc6N","wbU1mxDZVVXETz5AqhmzUV","rcU1mxDZVVXETz5W2ar4nD","TtTTvIjJVVXETz5opBkDNz","rclrk9xpVVXETz59xlpjlq","TtTTvIjJVVXETz5RXg02xn","U1zAzfCKVVXETz5EvvhT7O","TtTTv1aKVVXETz5UqdNz3Y","TtTTvIjJVVXETz5dKaYioJ","wbU1mxDZVVXETz5tak52hl","rcU1mxDZVVXETz5MqefX1H","TtTTvIjJVVXETz5J8lAytT","rclrk9xpVVXETz5g1KNJBU","TtTTvIjJVVXETz5XPzqNC0","U1zAzfCKVVXETz5LDVWdnn","TtTUK6pcVVXETz557NTPQK","VVXCL1z8iwdJga","VVXTyAkxWDBwsO","wwVVXMtAnqbdmwwU","wwVVXMoy1DizF7Li","wwVVXMm4wZKNUtRx","ik889fx8VVX21dRkN6NSOR","ik889fx8VVX21dRU75x7JZ","wwVVXMhWUwJbWkej","wwVVXMIEshWy5ODS","ik889fx8VVX21dRYvP1lwq","ik889fx8VVX21dRDRO2TLy","ik889fx8VVX21dRidPRh6F","ik889fx8VVX21dRbBmvUBC"],"loadWidgetKeys":["VVXJPrWIomEfRg","wwVVXIutm6Z8hQfk","VVXIreoGHypWU2","TtTULQotVVXIOjlWd4bOqt","VVXHj6tWrBn7U1","VVXGZXaB5IUFZw","VVXGWlXyXVZ18u","VVXFPo5QVVXFWyLHezyLaS","VVXFN87NVVXFWyL8nfrqPP","VVXFCroqVVXFWyLlfggYCY","VVXFPo5Qru7ZBq","VVXFN87NDnrgvO","VVXFCroqevSa3X","wwVVX8wRwIpyv7e2","VVX8VkOaS5wkI5","VVX7Wz9CzC0xhE","wbVVX6x2TxrA2LO4","wwVVXUEAhXPAoKwM","wwVVXTHHricXfawV","wwVVXTCERsHyV2wp","VVXHYBZpLszhtz","VVXHLkYneKUxcz","VVXE5mxiE9XuOi","VVXCL1z8iwdJga","VVXTyAkxWDBwsO","wwVVXMtAnqbdmwwU","wwVVXMoy1DizF7Li","wwVVXMm4wZKNUtRx","ik889fx8VVX21dRkN6NSOR","ik889fx8VVX21dRU75x7JZ","wwVVXMhWUwJbWkej","wwVVXMIEshWy5ODS","ik889fx8VVX21dRYvP1lwq","ik889fx8VVX21dRDRO2TLy","ik889fx8VVX21dRidPRh6F","ik889fx8VVX21dRbBmvUBC"]}},"widgets":{"rcVVWxfbWM3Csg6e":{"type":"rResCanvas","domId":"mb-q6iqi8","canvasKey":"rcVVWxfbWM3Csg6e","state":{"visible":true,"x":959,"y":1036.5,"width":1920,"height":1753,"opacity":1,"text":""},"config":{"__name":"页面 1","__geometry":{"rotation":0,"position":"absolute","canvas":true,"overlay":false}}},"wwVVXIutm6Z8hQfk":{"type":"wWrap","domId":"mb-c4c69c","canvasKey":"rcVVWxfbWM3Csg6e","state":{"visible":true,"x":1839,"y":994,"width":0,"height":0,"opacity":1,"text":""},"config":{"__name":"群组 2","__geometry":{"rotation":0,"position":"fixed","canvas":false,"overlay":false}},"events":[{"trigger":"tap","actions":[{"method":"setVisibility","params":{"interactionType":6,"key":"itaVVXJzhdDrt4IFa","interactionTrigger":"tap","actionType":"toggleVisibility","targetWidgetKey":"VVXJPrWIomEfRg","transitionDelay":"0","setVisibleTransition":"auto","setVisibleTransitionDuration":"0.2s","setVisibleTransitionEasing":"linear","setHiddenTransition":"auto","setHiddenTransitionDuration":"0.2s","setHiddenTransitionEasing":"linear","order":1,"!validVersion":2,"triggerDisable":false,"actionDisable":false},"interactionType":6,"order":1,"delay":0}]}],"timerDuration":0}]},"VVX7Wz9CzC0xhE":{"type":"wBasket","domId":"mb-sqehlt","canvasKey":"rcVVWxfbWM3Csg6e","state":{"visible":true,"x":1843,"y":164.5,"width":154,"height":185,"opacity":1,"text":"","activeCanvasKey":"rcUTzdlcUk2y0qcWS94YnN"},"config":{"refRBPageKey":"rbpUTzdlUk2y0qctZlr0gD","refContentKey":"rcUTzdlcUk2y0qcWS94YnN","scroll":1,"layout":"row","showScrollBar":3,"__name":"下拉菜单-按钮2 1","__geometry":{"rotation":0,"position":"absolute","canvas":false,"overlay":false}}},"wbVVX6x2TxrA2LO4":{"type":"wBasket","domId":"mb-fosafk","canvasKey":"rcVVWxfbWM3Csg6e","state":{"visible":true,"x":1843,"y":37.5,"width":69,"height":70,"opacity":1,"text":"","activeCanvasKey":"rcVVX6x2TDtD9pvp"},"config":{"refRBPageKey":"rbpVVX6x2VDLwGpOf","refContentKey":"rcVVX6x2TDtD9pvp","scroll":1,"layout":"row","showScrollBar":3,"__name":"头像-图片 1","__geometry":{"rotation":0,"position":"absolute","canvas":false,"overlay":false}}},"wwVVX8wRwIpyv7e2":{"type":"wWrap","domId":"mb-1yya1y5","canvasKey":"rcVVWxfbWM3Csg6e","state":{"visible":true,"x":101,"y":552,"width":0,"height":0,"opacity":1,"text":""},"config":{"__name":"群组 1","__geometry":{"rotation":0,"position":"fixed","canvas":false,"overlay":false}}},"wwVVXUEAhXPAoKwM":{"type":"wWrap","domId":"mb-1d1zpuz","canvasKey":"rcVVWxfbWM3Csg6e","state":{"visible":true,"x":960,"y":118.5,"width":0,"height":0,"opacity":1,"text":""},"config":{"__name":"群组 10","__geometry":{"rotation":0,"position":"absolute","canvas":false,"overlay":false}}},"VVXTyAkxWDBwsO":{"type":"wRect","domId":"mb-wh2f8e","canvasKey":"rcVVWxfbWM3Csg6e","state":{"visible":true,"x":0,"y":-68.5,"width":1919,"height":99,"opacity":1,"text":""},"config":{"__name":"矩形 1","__geometry":{"rotation":0,"position":"absolute","canvas":false,"overlay":false}}},"VVXCL1z8iwdJga":{"type":"wImage","domId":"mb-17em5zr","canvasKey":"rcVVWxfbWM3Csg6e","state":{"visible":true,"x":-893,"y":-68.5,"width":133,"height":99,"opacity":1,"text":""},"config":{"__name":"图片 1","__geometry":{"rotation":0,"position":"absolute","canvas":false,"overlay":false}}},"ik889fx8VVX21dRbBmvUBC":{"type":"wRect","domId":"mb-1s04cpa","canvasKey":"rcVVWxfbWM3Csg6e","state":{"visible":true,"x":960,"y":370.5,"width":1920,"height":541,"opacity":1,"text":""},"config":{"__name":"矩形 7 8XjUbRA","__geometry":{"rotation":0,"position":"absolute","canvas":false,"overlay":false}}},"wwVVXMtAnqbdmwwU":{"type":"wWrap","domId":"mb-wnk6us","canvasKey":"rcVVWxfbWM3Csg6e","state":{"visible":true,"x":924,"y":366,"width":0,"height":0,"opacity":1,"text":""},"config":{"__name":"群组 7","__geometry":{"rotation":0,"position":"absolute","canvas":false,"overlay":false}}},"wwVVXMoy1DizF7Li":{"type":"wWrap","domId":"mb-px7zma","canvasKey":"rcVVWxfbWM3Csg6e","state":{"visible":true,"x":48,"y":-164.5,"width":0,"height":0,"opacity":1,"text":""},"config":{"__name":"群组 6","__geometry":{"rotation":0,"position":"absolute","canvas":false,"overlay":false}}},"wwVVXMm4wZKNUtRx":{"type":"wWrap","domId":"mb-1qqow6i","canvasKey":"rcVVWxfbWM3Csg6e","state":{"visible":true,"x":-9.5,"y":66,"width":0,"height":0,"opacity":1,"text":""},"config":{"__name":"群组 5","__geometry":{"rotation":0,"position":"absolute","canvas":false,"overlay":false}}},"ik889fx8VVX21dRkN6NSOR":{"type":"wRect","domId":"mb-pipx7g","canvasKey":"rcVVWxfbWM3Csg6e","state":{"visible":true,"x":-82.5,"y":0,"width":144,"height":33,"opacity":1,"text":"免费使用"},"config":{"__name":"矩形 Copy 3 Po6xPMD","__geometry":{"rotation":0,"position":"absolute","canvas":false,"overlay":false}}},"ik889fx8VVX21dRU75x7JZ":{"type":"wRect","domId":"mb-txzl1l","canvasKey":"rcVVWxfbWM3Csg6e","state":{"visible":true,"x":82.5,"y":0,"width":144,"height":33,"opacity":1,"text":"预约演示"},"config":{"__name":"矩形 Copy 2 vxAXx02","__geometry":{"rotation":0,"position":"absolute","canvas":false,"overlay":false}}},"wwVVXMhWUwJbWkej":{"type":"wWrap","domId":"mb-fwab94","canvasKey":"rcVVWxfbWM3Csg6e","state":{"visible":true,"x":0,"y":-24,"width":0,"height":0,"opacity":1,"text":""},"config":{"__name":"群组 4","__geometry":{"rotation":0,"position":"absolute","canvas":false,"overlay":false}}},"wwVVXMIEshWy5ODS":{"type":"wWrap","domId":"mb-16ctodk","canvasKey":"rcVVWxfbWM3Csg6e","state":{"visible":true,"x":-9.5,"y":45.5,"width":0,"height":0,"opacity":1,"text":""},"config":{"__name":"群组 3","__geometry":{"rotation":0,"position":"absolute","canvas":false,"overlay":false}}},"ik889fx8VVX21dRYvP1lwq":{"type":"wRichText","domId":"mb-1gvcub3","canvasKey":"rcVVWxfbWM3Csg6e","state":{"visible":true,"x":0,"y":0,"width":657,"height":26,"opacity":1,"text":"为迅速表达想法、与团队同步节奏、高效团队协作而生的云端平台"},"config":{"__name":"文字 2 TjPe5yV","__geometry":{"rotation":0,"position":"absolute","canvas":false,"overlay":false}}},"ik889fx8VVX21dRDRO2TLy":{"type":"wRichText","domId":"mb-6obq8l","canvasKey":"rcVVWxfbWM3Csg6e","state":{"visible":true,"x":0,"y":-13,"width":676,"height":91,"opacity":1,"text":"产品设计  不止于快"},"config":{"__name":"文字 zG1xeoM","__geometry":{"rotation":0,"position":"absolute","canvas":false,"overlay":false}}},"ik889fx8VVX21dRidPRh6F":{"type":"wImage","domId":"mb-iixb3e","canvasKey":"rcVVWxfbWM3Csg6e","state":{"visible":true,"x":0,"y":29.5,"width":958,"height":435,"opacity":1,"text":""},"config":{"__name":"图片 3 Copy Jz4y12J","__geometry":{"rotation":0,"position":"absolute","canvas":false,"overlay":false}}}},"variables":{},"variableTypes":{},"variableBindings":{},"warnings":[]}
+</script>
+  <script>
+    /* 精简运行时：保留核心交互（侧边栏展开/收起、AI 按钮点击打开弹窗、评分星星点击、下拉菜单） */
+    (function () {
+      'use strict';
+      document.addEventListener('DOMContentLoaded', function () {
+
+        /* 侧边栏 展开/收起 */
+        var sideWrap = document.getElementById('mb-1yya1y5');
+        var collapseBtn = document.getElementById('mb-61g8iq');
+        var expandBtn = document.getElementById('mb-10fk6s9');
+
+        if (collapseBtn) {
+          collapseBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var src = sideWrap.querySelector('[data-mb-basket-canvas="true"]');
+            var canvases = sideWrap.querySelectorAll('[data-mb-basket-canvas="true"]');
+            if (canvases.length > 1) {
+              canvases[0].hidden = true;
+              canvases[1].hidden = false;
+            }
+          });
+        }
+        if (expandBtn) {
+          expandBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var canvases = sideWrap.querySelectorAll('[data-mb-basket-canvas="true"]');
+            if (canvases.length > 1) {
+              canvases[1].hidden = true;
+              canvases[0].hidden = false;
+            }
+          });
+        }
+
+        /* 评分星星：点击切换选中 */
+        var stars = document.querySelectorAll('[id^="mb-1kayjox"], [id^="mb-aojnk2"], [id^="mb-1iq77oq"], [id^="mb-1rqscv2"], [id^="mb-1dyook7"]');
+        stars.forEach(function (star) {
+          star.addEventListener('click', function () {
+            star.parentNode.querySelectorAll('[data-mb-basket-canvas="true"]').forEach(function (c) {
+              c.hidden = true;
+            });
+            star.querySelector('[data-mb-basket-canvas="true"]').hidden = false;
+          });
+        });
+
+        /* AI 按钮点击打开原有 Dialog */
+        var aiBtn = document.getElementById('mb-xrpsd3');
+        var dialogWrap = document.getElementById('mb-1usihap');
+        if (aiBtn && dialogWrap) {
+          aiBtn.addEventListener('click', function () {
+            dialogWrap.hidden = !dialogWrap.hidden;
+          });
+        }
+
+        /* 下拉菜单 hover 展开 */
+        var dropdownWrap = document.getElementById('mb-sqehlt');
+        var dropTrigger = document.querySelector('#mb-1kr124r') || null;
+        if (dropdownWrap) {
+          var parent = dropdownWrap.parentNode;
+          parent.addEventListener('mouseenter', function () {
+            dropdownWrap.style.clipPath = 'inset(0 0 0 0)';
+          });
+          parent.addEventListener('mouseleave', function () {
+            dropdownWrap.style.clipPath = 'inset(0 0 157px 0)';
+          });
+        }
+
+      });
+    })();
+  </script>
+</body>
+
+</html>

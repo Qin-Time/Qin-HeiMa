@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>产品设计 不止于快</title>
+  <style>
+    :root {
+      --blue: #409EFF;
+      --blue-deep: #2E53E4;
+      --text: #101010;
+      --text-2: #525E71;
+      --text-3: #909399;
+      --border: #E4E7ED;
+      --border-light: #EBEDF0;
+      --bg: #F5F7FA;
+      --radius: 8px;
+      --header-h: 64px;
+      --nav-w: 220px;
+      --nav-w-min: 64px;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, .05);
+      --shadow-md: 0 8px 24px rgba(0, 0, 0, .08);
+      --shadow-lg: 0 16px 40px rgba(0, 0, 0, .14);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: -apple-system, "SF UI Text", "Helvetica Neue", Arial,
+        "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Zen Hei", sans-serif;
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--text);
+      background: var(--bg);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    button {
+      font: inherit;
+      color: inherit;
+      cursor: pointer;
+    }
+
+    input {
+      font: inherit;
+    }
+
+    ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    /* ============ 吸顶头部 ============ */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      height: var(--header-h);
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow .2s ease;
+    }
+
+    .site-header.is-stuck {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, .08);
+    }
+
+    .header-inner {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      padding: 0 24px;
+    }
+
+    /* logo */
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--blue-deep);
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: .5px;
+      flex: none;
+    }
+
+    .logo-mark {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #409EFF, #2E53E4);
+      box-shadow: 0 4px 10px rgba(64, 158, 255, .35);
+    }
+
+    /* 顶部导航 */
+    .top-nav {
+      display: flex;
+      align-items: stretch;
+      height: 100%;
+      gap: 2px;
+      flex: none;
+    }
+
+    .top-nav a {
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      color: #262626;
+      font-size: 14px;
+      text-decoration: none;
+      transition: color .18s ease;
+    }
+
+    .top-nav a:hover {
+      color: var(--blue);
+    }
+
+    .top-nav a.active {
+      color: var(--blue);
+      font-weight: 500;
+    }
+
+    .top-nav a.active::after {
+      content: "";
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 0;
+      height: 2px;
+      border-radius: 2px 2px 0 0;
+      background: var(--blue);
+    }
+
+    .top-nav a.muted {
+      color: #BBBBBB;
+    }
+
+    .header-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    /* 搜索框 */
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 220px;
+      height: 36px;
+      padding: 0 14px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--text-3);
+      transition: border-color .2s ease, box-shadow .2s ease;
+    }
+
+    .search-box:focus-within {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(64, 158, 255, .12);
+    }
+
+    .search-box svg {
+      flex: none;
+    }
+
+    .search-box input {
+      flex: 1;
+      min-width: 0;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--text);
+    }
+
+    .search-box input::placeholder {
+      color: #C1C2C5;
+    }
+
+    /* 下拉菜单 */
+    .dropdown {
+      position: relative;
+    }
+
+    .dropdown-toggle {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      height: 36px;
+      padding: 0 14px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--text);
+      transition: border-color .2s ease, color .2s ease;
+    }
+
+    .dropdown-toggle:hover {
+      border-color: #C6DCFB;
+      color: var(--blue);
+    }
+
+    .dropdown-toggle .caret {
+      transition: transform .22s ease;
+    }
+
+    .dropdown.open .dropdown-toggle {
+      border-color: var(--blue);
+      color: var(--blue);
+    }
+
+    .dropdown.open .caret {
+      transform: rotate(180deg);
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      min-width: 152px;
+      padding: 6px;
+      background: #fff;
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-8px);
+      transition: opacity .18s ease, transform .18s ease, visibility .18s;
+    }
+
+    .dropdown.open .dropdown-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .dropdown-menu li {
+      padding: 9px 12px;
+      border-radius: 6px;
+      color: #262626;
+      cursor: pointer;
+      transition: background .15s ease, color .15s ease;
+    }
+
+    .dropdown-menu li:hover {
+      background: #ECF5FF;
+      color: var(--blue);
+    }
+
+    /* 头像 */
+    .avatar {
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7FBAFF, #2E6FD9);
+      box-shadow: 0 2px 8px rgba(46, 111, 217, .28);
+      flex: none;
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .avatar:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(46, 111, 217, .35);
+    }
+
+    /* ============ 固定左侧导航 ============ */
+    .side-nav {
+      position: fixed;
+      top: var(--header-h);
+      left: 0;
+      bottom: 0;
+      z-index: 900;
+      width: var(--nav-w);
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      border-right: 1px solid #DCE0E7;
+      transition: width .22s cubic-bezier(.4, 0, .2, 1);
+    }
+
+    .side-nav.collapsed {
+      width: var(--nav-w-min);
+    }
+
+    .side-nav-head {
+      flex: none;
+      padding: 12px;
+    }
+
+    .nav-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      height: 38px;
+      padding: 0;
+      border: 0;
+      border-radius: 8px;
+      background: var(--blue);
+      color: #fff;
+      font-size: 14px;
+      transition: background .2s ease, width .22s ease, border-radius .22s ease;
+    }
+
+    .nav-toggle:hover {
+      background: #66B1FF;
+    }
+
+    .nav-toggle-icon {
+      transition: transform .22s ease;
+      flex: none;
+    }
+
+    .side-nav.collapsed .nav-toggle {
+      width: 40px;
+      height: 40px;
+      margin: 0 auto;
+      border-radius: 50%;
+      background: #ECF5FF;
+      color: var(--blue);
+    }
+
+    .side-nav.collapsed .nav-toggle:hover {
+      background: #D9ECFF;
+    }
+
+    .side-nav.collapsed .nav-toggle-icon {
+      transform: rotate(180deg);
+    }
+
+    .side-nav.collapsed .nav-toggle-label {
+      display: none;
+    }
+
+    .side-nav-body {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 0 8px 16px;
+      scrollbar-width: thin;
+    }
+
+    .side-nav-body::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .side-nav-body::-webkit-scrollbar-thumb {
+      background: #DEE0E2;
+      border-radius: 4px;
+    }
+
+    .side-nav-body::-webkit-scrollbar-thumb:hover {
+      background: #C6C9CC;
+    }
+
+    .side-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      height: 42px;
+      padding: 0 14px;
+      border-radius: 8px;
+      color: #262626;
+      cursor: pointer;
+      white-space: nowrap;
+      user-select: none;
+      transition: background .16s ease, color .16s ease;
+    }
+
+    .nav-item svg {
+      flex: none;
+      color: #595959;
+      transition: color .16s ease;
+    }
+
+    .nav-item:hover {
+      background: #F5F7FA;
+    }
+
+    .nav-item.active {
+      background: #E6F7FF;
+      color: #1684FC;
+      font-weight: 500;
+    }
+
+    .nav-item.active svg {
+      color: #1684FC;
+    }
+
+    .nav-group {
+      padding: 16px 14px 8px;
+      color: #C1C2C5;
+      font-size: 12px;
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+
+    .side-nav.collapsed .nav-item {
+      justify-content: center;
+      padding: 0;
+      gap: 0;
+    }
+
+    .side-nav.collapsed .nav-text,
+    .side-nav.collapsed .nav-group {
+      display: none;
+    }
+
+    /* ============ 主内容区 ============ */
+    .page-content {
+      margin-left: var(--nav-w);
+      min-height: calc(100vh - var(--header-h));
+      padding-bottom: 96px;
+      transition: margin-left .22s cubic-bezier(.4, 0, .2, 1);
+    }
+
+    body.nav-collapsed .page-content {
+      margin-left: var(--nav-w-min);
+    }
+
+    /* Hero */
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 80px 48px 88px;
+      background: linear-gradient(120deg, #4095E5 0%, #2E6FD9 55%, #2E53E4 100%);
+      color: #fff;
+    }
+
+    .hero::before,
+    .hero::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .hero::before {
+      right: -140px;
+      top: -160px;
+      width: 520px;
+      height: 520px;
+      background: radial-gradient(circle at 32% 32%, rgba(255, 255, 255, .28), transparent 70%);
+    }
+
+    .hero::after {
+      left: -160px;
+      bottom: -220px;
+      width: 460px;
+      height: 460px;
+      background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, .16), transparent 70%);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 840px;
+    }
+
+    .hero h1 {
+      margin: 0 0 20px;
+      font-size: 56px;
+      line-height: 1.16;
+      font-weight: 400;
+      letter-spacing: 1px;
+    }
+
+    .hero p {
+      margin: 0 0 38px;
+      font-size: 17px;
+      line-height: 1.65;
+      color: rgba(255, 255, 255, .88);
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .btn {
+      height: 44px;
+      padding: 0 30px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: transform .18s ease, background .18s ease,
+        box-shadow .18s ease, border-color .18s ease;
+    }
+
+    .btn:active {
+      transform: scale(.97);
+    }
+
+    .btn-primary {
+      background: #fff;
+      color: var(--blue-deep);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, .14);
+    }
+
+    .btn-primary:hover {
+      background: #F0F6FF;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, .2);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: #fff;
+      border-color: rgba(255, 255, 255, .75);
+    }
+
+    .btn-ghost:hover {
+      background: rgba(255, 255, 255, .14);
+    }
+
+    .btn-default {
+      background: #fff;
+      color: #262626;
+      border-color: var(--border);
+    }
+
+    .btn-default:hover {
+      border-color: var(--blue);
+      color: var(--blue);
+    }
+
+    /* 通用区块 */
+    .section {
+      padding: 36px 48px 0;
+    }
+
+    .section:last-of-type {
+      padding-bottom: 24px;
+    }
+
+    .section-title {
+      margin: 0 0 20px;
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: .5px;
+    }
+
+    /* 标签 */
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 34px;
+      padding: 0 12px;
+      border: 1px solid;
+      border-radius: 6px;
+      font-size: 13px;
+      transition: transform .16s ease, box-shadow .16s ease;
+    }
+
+    .tag:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .tag-blue {
+      background: #ECF5FF;
+      border-color: #B3D8FF;
+      color: #409EFF;
+    }
+
+    .tag-green {
+      background: #F0F9EB;
+      border-color: #C2E7B0;
+      color: #67C23A;
+    }
+
+    .tag-gray {
+      background: #F4F4F5;
+      border-color: #D3D4D6;
+      color: #909399;
+    }
+
+    .tag-orange {
+      background: #FDF6EC;
+      border-color: #F5DAB1;
+      color: #E6A23C;
+    }
+
+    .tag-red {
+      background: #FEF0F0;
+      border-color: #FBC4C4;
+      color: #F56C6C;
+    }
+
+    .tag-close {
+      display: grid;
+      place-items: center;
+      width: 16px;
+      height: 16px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      color: inherit;
+      font-size: 14px;
+      line-height: 1;
+      opacity: .55;
+      transition: opacity .15s ease, background .15s ease;
+    }
+
+    .tag-close:hover {
+      opacity: 1;
+      background: rgba(0, 0, 0, .06);
+    }
+
+    .tag-add {
+      height: 34px;
+      padding: 0 16px;
+      border: 1px dashed #B3D8FF;
+      border-radius: 6px;
+      background: #fff;
+      color: var(--blue);
+      font-size: 13px;
+      transition: background .16s ease, border-color .16s ease;
+    }
+
+    .tag-add:hover {
+      background: #ECF5FF;
+      border-color: var(--blue);
+    }
+
+    /* 评分 */
+    .rating-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 26px;
+    }
+
+    .rating-label {
+      color: var(--text-3);
+      font-size: 13px;
+    }
+
+    .rating {
+      display: flex;
+      gap: 4px;
+    }
+
+    .star {
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: #C0C4CC;
+      transition: transform .16s ease, color .16s ease;
+    }
+
+    .star svg {
+      width: 100%;
+      height: 100%;
+      fill: currentColor;
+      display: block;
+    }
+
+    .star.active {
+      color: #FA8C16;
+    }
+
+    .star:hover {
+      transform: scale(1.18);
+    }
+
+    /* 卡片网格 */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 22px;
+    }
+
+    .card {
+      display: flex;
+      overflow: hidden;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 4px 12px 2px rgba(0, 0, 0, .04);
+      transition: transform .22s ease, box-shadow .22s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, .1);
+    }
+
+    .card-media {
+      position: relative;
+      flex: none;
+      width: 160px;
+      overflow: hidden;
+    }
+
+    .card-media::after {
+      content: "";
+      position: absolute;
+      right: -24px;
+      bottom: -24px;
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .28);
+    }
+
+    .card:nth-child(6n+1) .card-media {
+      background: linear-gradient(135deg, #4FACFE, #00F2FE);
+    }
+
+    .card:nth-child(6n+2) .card-media {
+      background: linear-gradient(135deg, #F6D365, #FDA085);
+    }
+
+    .card:nth-child(6n+3) .card-media {
+      background: linear-gradient(135deg, #A1C4FD, #C2E9FB);
+    }
+
+    .card:nth-child(6n+4) .card-media {
+      background: linear-gradient(135deg, #84FAB0, #8FD3F4);
+    }
+
+    .card:nth-child(6n+5) .card-media {
+      background: linear-gradient(135deg, #FBC2EB, #A6C1EE);
+    }
+
+    .card:nth-child(6n+6) .card-media {
+      background: linear-gradient(135deg, #FFECD2, #FCB69F);
+    }
+
+    .card-body {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 18px 20px;
+    }
+
+    .card-body h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.4;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .card-body p {
+      margin: 0;
+      color: var(--text-3);
+      font-size: 13px;
+      line-height: 1.6;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-footer {
+      margin-top: auto;
+      padding-top: 8px;
+    }
+
+    .btn-sm {
+      height: 32px;
+      padding: 0 18px;
+      border: 0;
+      border-radius: 6px;
+      background: var(--blue);
+      color: #fff;
+      font-size: 13px;
+      transition: background .18s ease, transform .18s ease;
+    }
+
+    .btn-sm:hover {
+      background: #66B1FF;
+    }
+
+    .btn-sm:active {
+      transform: scale(.97);
+    }
+
+    /* ============ 右下角 AI 悬浮按钮（fixed） ============ */
+    .ai-fab {
+      position: fixed;
+      right: 32px;
+      bottom: 32px;
+      z-index: 1100;
+      width: 64px;
+      height: 64px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #D33A2B, #BD3124);
+      color: #fff;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: .5px;
+      box-shadow: 0 10px 24px rgba(189, 49, 36, .38);
+      transition: transform .2s cubic-bezier(.2, .8, .3, 1), box-shadow .2s ease;
+    }
+
+    .ai-fab::after {
+      content: "问AI";
+      position: absolute;
+      right: 76px;
+      top: 50%;
+      transform: translateY(-50%) translateX(6px);
+      padding: 5px 10px;
+      border-radius: 6px;
+      background: rgba(0, 0, 0, .72);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 400;
+      letter-spacing: 0;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease, transform .2s ease;
+    }
+
+    .ai-fab:hover {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 16px 32px rgba(189, 49, 36, .45);
+    }
+
+    .ai-fab:hover::after {
+      opacity: 1;
+      transform: translateY(-50%) translateX(0);
+    }
+
+    .ai-fab:active {
+      transform: scale(.96);
+    }
+
+    /* ============ 弹窗 ============ */
+    .modal-mask {
+      position: fixed;
+      inset: 0;
+      z-index: 1200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(0, 0, 0, .45);
+      animation: fadeIn .2s ease;
+    }
+
+    .modal-mask[hidden] {
+      display: none;
+    }
+
+    .modal {
+      width: min(420px, 100%);
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, .24);
+      overflow: hidden;
+      animation: popIn .24s cubic-bezier(.2, .8, .3, 1);
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 20px 0;
+    }
+
+    .modal-head h3 {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .modal-close {
+      margin-left: auto;
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--text-3);
+      font-size: 18px;
+      line-height: 1;
+      transition: background .16s ease, color .16s ease;
+    }
+
+    .modal-close:hover {
+      background: #F5F7FA;
+      color: var(--text);
+    }
+
+    .modal-body {
+      padding: 14px 20px 24px;
+      color: var(--text-2);
+      line-height: 1.7;
+    }
+
+    .modal-foot {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 14px 20px;
+      border-top: 1px solid var(--border-light);
+      background: #FAFBFC;
+    }
+
+    .modal-foot .btn {
+      height: 36px;
+      padding: 0 22px;
+      font-size: 14px;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0
+      }
+
+      to {
+        opacity: 1
+      }
+    }
+
+    @keyframes popIn {
+      from {
+        opacity: 0;
+        transform: scale(.94) translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    /* ============ 响应式 ============ */
+    @media (max-width:1180px) {
+      .search-box {
+        width: 170px;
+      }
+    }
+
+    @media (max-width:900px) {
+      .top-nav {
+        display: none;
+      }
+
+      .side-nav {
+        width: var(--nav-w-min);
+      }
+
+      .side-nav .nav-text,
+      .side-nav .nav-group,
+      .side-nav .nav-toggle-label {
+        display: none;
+      }
+
+      .side-nav .nav-item {
+        justify-content: center;
+        padding: 0;
+        gap: 0;
+      }
+
+      .side-nav .nav-toggle {
+        width: 40px;
+        height: 40px;
+        margin: 0 auto;
+        padding: 0;
+        border-radius: 50%;
+        background: #ECF5FF;
+        color: var(--blue);
+      }
+
+      .side-nav .nav-toggle-icon {
+        transform: rotate(180deg);
+      }
+
+      .page-content,
+      body.nav-collapsed .page-content {
+        margin-left: var(--nav-w-min);
+      }
+
+      .hero {
+        padding: 56px 24px 64px;
+      }
+
+      .hero h1 {
+        font-size: 36px;
+      }
+
+      .hero p {
+        font-size: 15px;
+      }
+
+      .section {
+        padding: 28px 24px 0;
+      }
+
+      .ai-fab {
+        right: 20px;
+        bottom: 20px;
+        width: 56px;
+        height: 56px;
+        font-size: 19px;
+      }
+    }
+
+    @media (max-width:620px) {
+      .header-inner {
+        gap: 14px;
+        padding: 0 14px;
+      }
+
+      .search-box {
+        display: none;
+      }
+
+      .logo-text {
+        display: none;
+      }
+
+      .hero h1 {
+        font-size: 30px;
+      }
+
+      .card {
+        flex-direction: column;
+      }
+
+      .card-media {
+        width: 100%;
+        height: 120px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: .001ms !important;
+        transition-duration: .001ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ==================== 吸顶头部（sticky） ==================== -->
+  <header class="site-header" id="siteHeader">
+    <div class="header-inner">
+
+      <a class="logo" href="#">
+        <span class="logo-mark" aria-hidden="true"></span>
+        <span class="logo-text">Cloud</span>
+      </a>
+
+      <nav class="top-nav" aria-label="主导航">
+        <a href="#" class="active">首页</a>
+        <a href="#">订单管理</a>
+        <a href="#">消息管理</a>
+        <a href="#" class="muted">行业资料</a>
+      </nav>
+
+      <div class="header-right">
+        <label class="search-box">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"></circle>
+            <line x1="21" y1="21" x2="16.7" y2="16.7"></line>
+          </svg>
+          <input type="text" placeholder="请输入内容" aria-label="搜索">
+        </label>
+
+        <div class="dropdown" data-dropdown>
+          <button class="dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false">
+            图纸
+            <svg class="caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <ul class="dropdown-menu" role="menu">
+            <li role="menuitem">选项1</li>
+            <li role="menuitem">选项2</li>
+            <li role="menuitem">选项3</li>
+            <li role="menuitem">选项4</li>
+          </ul>
+        </div>
+
+        <button class="avatar" type="button" aria-label="账户"></button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ==================== 固定左侧导航（fixed） ==================== -->
+  <aside class="side-nav" id="sideNav" aria-label="侧边导航">
+    <div class="side-nav-head">
+      <button class="nav-toggle" id="navToggle" type="button" aria-label="收起导航">
+        <svg class="nav-toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        <span class="nav-toggle-label">收起</span>
+      </button>
+    </div>
+
+    <div class="side-nav-body">
+      <ul class="side-menu">
+        <li class="nav-item active">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 17l5-6 4 3.5L21 6"></path>
+            <path d="M15 6h6v6"></path>
+          </svg>
+          <span class="nav-text">导航一</span>
+        </li>
+        <li class="nav-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <ellipse cx="12" cy="6" rx="8" ry="3"></ellipse>
+            <path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6"></path>
+            <path d="M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"></path>
+          </svg>
+          <span class="nav-text">导航二</span>
+        </li>
+        <li class="nav-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+            <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+            <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+            <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+          </svg>
+          <span class="nav-text">导航三</span>
+        </li>
+        <li class="nav-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path
+              d="M19.4 15a1.7 1.7 0 00.3 1.9l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-2.9 1.2 2 2 0 11-4 0 1.7 1.7 0 00-2.9-1.2l-.1.1a2 2 0 11-2.8-2.8l.1-.1A1.7 1.7 0 003.4 15a2 2 0 110-4 1.7 1.7 0 001.2-2.9l-.1-.1a2 2 0 112.8-2.8l.1.1A1.7 1.7 0 0010.3 4a2 2 0 114 0 1.7 1.7 0 002.9 1.2l.1-.1a2 2 0 112.8 2.8l-.1.1A1.7 1.7 0 0020.6 11a2 2 0 110 4z">
+            </path>
+          </svg>
+          <span class="nav-text">导航四</span>
+        </li>
+      </ul>
+
+      <div class="nav-group">分组一</div>
+      <ul class="side-menu">
+        <li class="nav-item"><span class="nav-text">选项1</span></li>
+        <li class="nav-item"><span class="nav-text">选项2</span></li>
+      </ul>
+
+      <div class="nav-group">分组二</div>
+      <ul class="side-menu">
+        <li class="nav-item"><span class="nav-text">选项3</span></li>
+        <li class="nav-item"><span class="nav-text">选项4</span></li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- ==================== 主内容 ==================== -->
+  <main class="page-content">
+
+    <section class="hero">
+      <div class="hero-content">
+        <h1>产品设计&nbsp;&nbsp;不止于快</h1>
+        <p>为迅速表达想法、与团队同步节奏、高效团队协作而生的云端平台</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" type="button">免费使用</button>
+          <button class="btn btn-ghost" type="button">预约演示</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">标签与评分</h2>
+
+      <div class="tag-list" id="tagList">
+        <span class="tag tag-blue">标签一<button class="tag-close" type="button" aria-label="移除标签一">×</button></span>
+        <span class="tag tag-green">标签二<button class="tag-close" type="button" aria-label="移除标签二">×</button></span>
+        <span class="tag tag-gray">标签三<button class="tag-close" type="button" aria-label="移除标签三">×</button></span>
+        <span class="tag tag-orange">标签四<button class="tag-close" type="button" aria-label="移除标签四">×</button></span>
+        <span class="tag tag-red">标签五<button class="tag-close" type="button" aria-label="移除标签五">×</button></span>
+        <button class="tag-add" type="button">+ 添加标签</button>
+      </div>
+
+      <div class="rating-row">
+        <span class="rating-label">评分</span>
+        <div class="rating" id="rating" data-value="3" role="radiogroup" aria-label="评分"></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">热门内容</h2>
+      <div class="card-grid">
+
+        <article class="card">
+          <div class="card-media" aria-hidden="true"></div>
+          <div class="card-body">
+            <h3>壮丽的海浪在夕阳下翻滚</h3>
+            <p>内容信息内容信息内容信息内容信息内容信息内容信息内容信息。</p>
+            <div class="card-footer">
+              <button class="btn-sm" type="button" data-modal-open>操作按钮</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-media" aria-hidden="true"></div>
+          <div class="card-body">
+            <h3>壮丽的海浪在夕阳下翻滚</h3>
+            <p>内容信息内容信息内容信息内容信息内容信息内容信息内容信息。</p>
+            <div class="card-footer">
+              <button class="btn-sm" type="button" data-modal-open>操作按钮</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-media" aria-hidden="true"></div>
+          <div class="card-body">
+            <h3>壮丽的海浪在夕阳下翻滚</h3>
+            <p>内容信息内容信息内容信息内容信息内容信息内容信息内容信息。</p>
+            <div class="card-footer">
+              <button class="btn-sm" type="button" data-modal-open>操作按钮</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-media" aria-hidden="true"></div>
+          <div class="card-body">
+            <h3>壮丽的海浪在夕阳下翻滚</h3>
+            <p>内容信息内容信息内容信息内容信息内容信息内容信息内容信息。</p>
+            <div class="card-footer">
+              <button class="btn-sm" type="button" data-modal-open>操作按钮</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-media" aria-hidden="true"></div>
+          <div class="card-body">
+            <h3>壮丽的海浪在夕阳下翻滚</h3>
+            <p>内容信息内容信息内容信息内容信息内容信息内容信息内容信息。</p>
+            <div class="card-footer">
+              <button class="btn-sm" type="button" data-modal-open>操作按钮</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-media" aria-hidden="true"></div>
+          <div class="card-body">
+            <h3>壮丽的海浪在夕阳下翻滚</h3>
+            <p>内容信息内容信息内容信息内容信息内容信息内容信息内容信息。</p>
+            <div class="card-footer">
+              <button class="btn-sm" type="button" data-modal-open>操作按钮</button>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== 右下角固定 AI 按钮（fixed） ==================== -->
+  <button class="ai-fab" id="aiFab" type="button" aria-label="问AI">AI</button>
+
+  <!-- ==================== 弹窗 ==================== -->
+  <div class="modal-mask" id="modal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-head">
+        <h3 id="modalTitle">标题</h3>
+        <button class="modal-close" type="button" data-modal-close aria-label="关闭">×</button>
+      </div>
+      <div class="modal-body">
+        <p>需要注意的是内容是默认不居中的</p>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-default" type="button" data-modal-close>取消</button>
+        <button class="btn btn-primary" type="button" data-modal-close>确定</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      /* ---------- 1. 侧边导航折叠 ---------- */
+      var body = document.body;
+      var sideNav = document.getElementById('sideNav');
+      var navToggle = document.getElementById('navToggle');
+      var navLabel = navToggle.querySelector('.nav-toggle-label');
+
+      navToggle.addEventListener('click', function () {
+        var collapsed = sideNav.classList.toggle('collapsed');
+        body.classList.toggle('nav-collapsed', collapsed);
+        navLabel.textContent = collapsed ? '展开' : '收起';
+        navToggle.setAttribute('aria-label', collapsed ? '展开导航' : '收起导航');
+      });
+
+      /* ---------- 2. 侧边导航选中态 ---------- */
+      var navItems = document.querySelectorAll('.nav-item');
+      navItems.forEach(function (item) {
+        item.addEventListener('click', function () {
+          navItems.forEach(function (i) { i.classList.remove('active'); });
+          item.classList.add('active');
+        });
+      });
+
+      /* ---------- 3. 下拉菜单 ---------- */
+      var dropdowns = document.querySelectorAll('[data-dropdown]');
+
+      function closeAllDropdowns(except) {
+        dropdowns.forEach(function (dd) {
+          if (dd === except) return;
+          dd.classList.remove('open');
+          dd.querySelector('.dropdown-toggle').setAttribute('aria-expanded', 'false');
+        });
+      }
+
+      dropdowns.forEach(function (dd) {
+        var toggle = dd.querySelector('.dropdown-toggle');
+        toggle.addEventListener('click', function (e) {
+          e.stopPropagation();
+          var willOpen = !dd.classList.contains('open');
+          closeAllDropdowns(dd);
+          dd.classList.toggle('open', willOpen);
+          toggle.setAttribute('aria-expanded', String(willOpen));
+        });
+
+        dd.querySelectorAll('.dropdown-menu li').forEach(function (li) {
+          li.addEventListener('click', function () {
+            toggle.firstChild.nodeValue = li.textContent.trim() + ' ';
+            dd.classList.remove('open');
+            toggle.setAttribute('aria-expanded', 'false');
+          });
+        });
+      });
+
+      document.addEventListener('click', function () { closeAllDropdowns(null); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeAllDropdowns(null);
+      });
+
+      /* ---------- 4. 头部滚动阴影 ---------- */
+      var header = document.getElementById('siteHeader');
+      var onScroll = function () {
+        header.classList.toggle('is-stuck', window.scrollY > 4);
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+
+      /* ---------- 5. 标签删除 ---------- */
+      document.querySelectorAll('.tag-close').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var tag = btn.closest('.tag');
+          if (!tag) return;
+          tag.style.transition = 'opacity .18s ease, transform .18s ease';
+          tag.style.opacity = '0';
+          tag.style.transform = 'scale(.85)';
+          setTimeout(function () { tag.remove(); }, 180);
+        });
+      });
+
+      /* ---------- 6. 评分星星 ---------- */
+      var rating = document.getElementById('rating');
+      if (rating) {
+        var STAR_PATH = 'M12 2.6l2.9 5.9 6.5.95-4.7 4.6 1.1 6.45L12 17.45 6.2 20.5l1.1-6.45-4.7-4.6 6.5-.95z';
+        var stars = [];
+
+        for (var i = 0; i < 5; i++) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'star';
+          b.setAttribute('role', 'radio');
+          b.setAttribute('aria-label', (i + 1) + ' 星');
+          b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + STAR_PATH + '"></path></svg>';
+          rating.appendChild(b);
+          stars.push(b);
+        }
+
+        var current = Number(rating.dataset.value) || 0;
+
+        function paint(n) {
+          stars.forEach(function (s, idx) {
+            var on = idx < n;
+            s.classList.toggle('active', on);
+            s.setAttribute('aria-checked', String(on));
+          });
+        }
+
+        stars.forEach(function (s, idx) {
+          s.addEventListener('mouseenter', function () { paint(idx + 1); });
+          s.addEventListener('click', function () {
+            current = idx + 1;
+            rating.dataset.value = String(current);
+            paint(current);
+          });
+          s.addEventListener('focus', function () { paint(idx + 1); });
+        });
+
+        rating.addEventListener('mouseleave', function () { paint(current); });
+        paint(current);
+      }
+
+      /* ---------- 7. 弹窗 ---------- */
+      var modal = document.getElementById('modal');
+      var lastFocus = null;
+
+      function openModal() {
+        lastFocus = document.activeElement;
+        modal.hidden = false;
+        document.body.style.overflow = 'hidden';
+        var first = modal.querySelector('.modal-close');
+        if (first) first.focus();
+      }
+
+      function closeModal() {
+        modal.hidden = true;
+        document.body.style.overflow = '';
+        if (lastFocus && lastFocus.focus) lastFocus.focus();
+      }
+
+      document.querySelectorAll('[data-modal-open]').forEach(function (btn) {
+        btn.addEventListener('click', openModal);
+      });
+
+      modal.querySelectorAll('[data-modal-close]').forEach(function (btn) {
+        btn.addEventListener('click', closeModal);
+      });
+
+      modal.addEventListener('click', function (e) {
+        if (e.target === modal) closeModal();
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && !modal.hidden) closeModal();
+      });
+
+      /* ---------- 8. AI 按钮 ---------- */
+      document.getElementById('aiFab').addEventListener('click', function () {
+        openModal();
+      });
+    })();
+  </script>
+
+</body>
+
+</html>
